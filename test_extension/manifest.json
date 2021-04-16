@@ -2,13 +2,24 @@
     "manifest_version": 2,
     "name": "Test Extension",
     "version": "1.0.0",
-    "browser_action": {
-        "default_popup": "popup.html"
-    },
     "content_scripts": [{
       "matches": ["*://*.stackoverflow.com/*"],
       "js": ["content.mjs"]
     }],
-    "web_accessible_resources":["script.mjs", "background.mjs"], 
-    "type" : "module"
+    "permissions": [
+      "tabs"
+    ],
+    "page_action": {
+      "default_popup" : "popup.html"
+    },
+    "background" : {
+      "scripts": ["background.js"],
+      "persistent" : false
+    },
+    "externally_connectable" : {
+      "ids" : ["bebffpohmffmkmbmanhdpepoineaegai"],
+      "matches" : ["*://*.stackoverflow.com/*"],
+      "accepts_tls_channel_id" : false
+    },
+    "web_accessible_resources":["script.mjs"]
   }

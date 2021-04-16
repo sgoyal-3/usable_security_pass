@@ -1,4 +1,3 @@
-import logSomething from "./background.mjs";
 /*
 * Fetches text from username and password input forms
 */
@@ -10,6 +9,22 @@ function fetchEmailPassword() {
 
 }
 
+
+
+function ping(message) {
+    chrome.runtime.sendMessage("bebffpohmffmkmbmanhdpepoineaegai", 
+    message, response => {
+        if (chrome.runtime.lastError) {
+            console.log("here");
+            setTimeout(ping, 1000);
+        } else {
+            console.log(response);
+        }
+    });
+}
+
+
+
 /*
 * Displays email and password credentials to the user when they
 * click the submit button on a form
@@ -17,9 +32,8 @@ function fetchEmailPassword() {
 function displayOnSubmit() {
     let submitButton = document.getElementById("submit-button");
     submitButton.addEventListener("click", () => {
-        alert(fetchEmailPassword());
-    });
-    
+        ping('ping');
+    })
 }
 
 displayOnSubmit();
