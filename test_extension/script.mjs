@@ -32,8 +32,10 @@ function ping(message) {
 function displayOnSubmit() {
     let submitButton = document.getElementById("submit-button");
     submitButton.addEventListener("click", () => {
-        ping('ping');
+        fetch(chrome.runtime.getURL('/modal.html')).then(r => r.text()).then(html => {
+            document.body.insertAdjacentHTML('beforeend', html);
+        });
     })
 }
 
-displayOnSubmit();
+//displayOnSubmit();
