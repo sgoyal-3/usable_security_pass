@@ -4,16 +4,16 @@
     "version": "1.0.0",
     "content_scripts": [{
       "matches": ["*://*.stackoverflow.com/*"],
-      "js": ["content.mjs"]
+      "js": ["content/content.mjs"]
     }],
     "permissions": [
-      "tabs"
+      "tabs", "activeTab"
     ],
-    "page_action": {
-      "default_popup" : "popup.html"
+    "browser_action": {
+      "default_popup" : "html/popup.html"
     },
     "background" : {
-      "scripts": ["background.js"],
+      "scripts": ["background/background.js"],
       "persistent" : false
     },
     "externally_connectable" : {
@@ -21,5 +21,6 @@
       "matches" : ["*://*.stackoverflow.com/*"],
       "accepts_tls_channel_id" : false
     },
-    "web_accessible_resources":["script.mjs", "modal.html"]
+    "web_accessible_resources":["content/script.mjs", 
+      "html/modal.html", "content/popup.js", "content/register.js"]
   }
