@@ -9,20 +9,17 @@ function fetchEmailPassword() {
 
 }
 
-
-
-function ping(message) {
+function sendMessage(message) {
     chrome.runtime.sendMessage("bebffpohmffmkmbmanhdpepoineaegai", 
     message, response => {
         if (chrome.runtime.lastError) {
             console.log("here");
-            setTimeout(ping, 1000);
+            setTimeout(() => sendMessage(message), 1000);
         } else {
             console.log(response);
         }
     });
 }
-
 
 
 /*
@@ -32,9 +29,7 @@ function ping(message) {
 function displayOnSubmit() {
     let submitButton = document.getElementById("submit-button");
     submitButton.addEventListener("click", () => {
-        fetch(chrome.runtime.getURL('/modal.html')).then(r => r.text()).then(html => {
-            document.body.insertAdjacentHTML('beforeend', html);
-        });
+        sendMessage("ping");
     })
 }
 

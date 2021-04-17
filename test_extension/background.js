@@ -10,11 +10,26 @@ function doInCurrentTab(tabCallback) {
 }
 
 
-
+/*
 chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
-    var activeTabId;
-    doInCurrentTab(function(tab) { activeTabId = tab.id});
-    console.log(activeTabId);
-    chrome.pageAction.show(442);
+    console.log(request);
     sendResponse('pong');
 });
+*/
+
+let modalOpened = false;
+
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        console.log(request);
+        if (request.modalOpened) {
+            modalOpened = request.modalOpened;
+            sendResponse('modal has been opened');
+        } else if (request === "openModal?") {
+            sendResponse({'openModal' : `${modalOpened}`})
+        } else {
+            sendResponse('pong');
+        }
+        
+    }
+)
