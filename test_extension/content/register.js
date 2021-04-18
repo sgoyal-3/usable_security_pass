@@ -63,6 +63,8 @@ function setSuccessFor(input) {
 	console.log("here");
 	const formControl = input.parentElement.parentElement;
 	formControl.className = 'form-control success';
+	const small = formControl.querySelector('small');
+	small.innerText = "";
 }
 
 /*
@@ -88,6 +90,9 @@ function checkPasswords(password, password2) {
 		setErrorFor(password2, "Passwords do not match");
 		return;
 	}
+
+	setSuccessFor(password);
+	setSuccessFor(password2);
 
 	/*
 	if (passwordValue.length < 15) {
