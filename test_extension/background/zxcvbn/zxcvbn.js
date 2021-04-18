@@ -26,7 +26,36 @@ var time_estimates;time_estimates={estimate_attack_times:function(e){var t,n,s,o
 },{}]},{},[4])(4)
 });
 
-console.log(zxcvbn('password'));
+window.addEventListener('load', () => {
+    let password = document.getElementById("password");
+    password.addEventListener('input', () => {
+        let passwordValue = password.value;
+        let zxcvbnResult = zxcvbn(passwordValue);
+        let score = zxcvbnResult.score;
+        let crackTimeDisplay = zxcvbnResult.crack_times_display.offline_fast_hashing_1e10_per_second;
+        let warning = zxcvbnResult.feedback.warning;
+        let suggestions = zxcvbnResult.feedback.suggestions;
+        
+        document.getElementById('password-display').innerHTML = `Current password: ${passwordValue}`;
+
+        let scoreElement = document.getElementById('score');
+        scoreElement.innerHTML = `Score: ${score}/4`;
+
+        let timeToCrackElement = document.getElementById('time-to-crack');
+        timeToCrackElement.innerHTML = `Time to crack: ${crackTimeDisplay}`;
+
+        let warningElement = document.getElementById('warning');
+        warningElement.innerHTML = `Warnings: ${warning}`
+
+        let suggestionsElement = document.getElementById('suggestions');
+        let suggestionString = "Suggestions: ";
+        for (var i = 0; i < suggestions.length; i++) {
+            suggestionString += `${suggestions[i]} \n`
+        }
+        suggestionsElement.innerHTML = suggestionString;
+
+    })
+})
 
 
 

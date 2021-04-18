@@ -1,4 +1,3 @@
-
 function doInCurrentTab(tabCallback) {
     chrome.tabs.query(
         { currentWindow: true, active: true },

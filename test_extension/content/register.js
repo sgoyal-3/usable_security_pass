@@ -4,7 +4,6 @@
 * and password
 */
 window.addEventListener('load', function() {
-	console.log("hello!");
 	const createAccount = document.getElementById('submit');
     const email = document.getElementById('email');
     const password = document.getElementById('password');
@@ -81,11 +80,16 @@ function checkPasswords(password, password2) {
 	let passwordValue = password.value;
 	let password2Value = password2.value;
 
+	if (passwordValue.length === 0) {
+		setErrorFor(password, "Password cannot be blank");
+	}
+
 	if (passwordValue !== password2Value) {
 		setErrorFor(password2, "Passwords do not match");
 		return;
 	}
 
+	/*
 	if (passwordValue.length < 15) {
 		setErrorFor(password, "Password must be at least 15 characters long");
 	}
@@ -113,6 +117,5 @@ function checkPasswords(password, password2) {
 	if (!hasLower || !hasUpper || !hasNumeral || !hasSpecial) {
 		setErrorFor(password, errMessage);
 	}
-
-
+	*/ 
 }
