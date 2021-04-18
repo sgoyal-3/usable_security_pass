@@ -9,14 +9,6 @@ function doInCurrentTab(tabCallback) {
     );
 }
 
-
-/*
-chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
-    console.log(request);
-    sendResponse('pong');
-});
-*/
-
 let modalOpened = false;
 
 chrome.runtime.onMessage.addListener(

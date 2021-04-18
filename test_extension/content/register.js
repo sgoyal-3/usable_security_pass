@@ -4,6 +4,7 @@
 * and password
 */
 window.addEventListener('load', function() {
+	console.log("hello!");
 	const createAccount = document.getElementById('submit');
     const email = document.getElementById('email');
     const password = document.getElementById('password');

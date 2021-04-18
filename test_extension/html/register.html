@@ -2,7 +2,13 @@
 <html>
     <head>
         <title>Test Extension - Register an Account</title>
-        <script src="../content/register.js"></script>
+        <script src="../content/register.js">
+            window.addEventListener("load", () => console.log("hello"));
+        </script>
+        <script type="text/javascript" src="../background/zxcvbn/zxcvbn.js">
+            console.log(zxcvbn('password'));
+            console.log("hello");
+        </script>
         <style>
             body {
                 font: 13px/20px "Lucida Grande", Tahoma, Verdana, sans-serif;
