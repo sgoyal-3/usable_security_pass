@@ -1,3 +1,13 @@
+/*
+This is the driver code for the content script. This is what is run on every page
+whose URL fits the matches clause specified in manifest.json
+*/
+
+
+/*
+* This block of code injects javascript from another file into the current page
+* Currently, there is nothing of interest being done in script.mjs
+*/
 var s = document.createElement('script');
 s.type = "module";
 s.src = chrome.runtime.getURL('content/script.mjs');
@@ -7,6 +17,11 @@ s.onload = function() {
 };
 
 
+/*
+* sendMessage: sends a message to the background script and interprets the response
+*
+* message: The message to send
+*/
 function sendMessage(message) {
     chrome.runtime.sendMessage("bebffpohmffmkmbmanhdpepoineaegai", 
     message, response => {
@@ -25,14 +40,17 @@ function sendMessage(message) {
     });
 }
 
-
+/*
+* displayModal: Display the modal popuup on a website asking user if they would like to
+* save their recently enetered credentials to their vault
+*/
 function displayModal() {
     fetch(chrome.runtime.getURL('/html/modal.html')).then(r => r.text()).then(html => {
         document.body.insertAdjacentHTML('beforeend', html);
     })
     .then(() => {
         document.getElementById("modal-email").value = document.getElementById("email").value;
-        document.getElementById("modal-pswd").value = document.getElementById("password").value;
+        document.getElementById("modal-password").value = document.getElementById("password").value;
         document.querySelector('.bg-modal').style.display = "flex";
 
     })

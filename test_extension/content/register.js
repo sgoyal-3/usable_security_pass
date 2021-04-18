@@ -1,4 +1,8 @@
-
+/*
+* Wait until page has loaded, then add event listener to the 
+* "Create Account" button that will check the value of email
+* and password
+*/
 window.addEventListener('load', function() {
 	const createAccount = document.getElementById('submit');
     const email = document.getElementById('email');
@@ -11,7 +15,12 @@ window.addEventListener('load', function() {
 })
 
 
-
+/*
+* checkInputs: Check the input fields to make sure:
+* - email is valid
+* - password is of sufficient strength
+* - original password and confirmed password are equivalent
+*/
 function checkInputs(email, password, password2) {
 	// trim to remove the whitespaces
 	const emailValue = email.value.trim();
@@ -32,24 +41,13 @@ function checkInputs(email, password, password2) {
 		setSuccessFor(email);
 	}
 	
-	/*
-	if(passwordValue === '') {
-		setErrorFor(password, 'Password cannot be blank');
-	} else {
-		setSuccessFor(password);
-	}
-	
-	if(password2Value === '') {
-		setErrorFor(password2, 'Password2 cannot be blank');
-	} else if(passwordValue !== password2Value) {
-		setErrorFor(password2, 'Passwords must not match');
-	} else{
-		setSuccessFor(password2);
-	}
-	*/
 	checkPasswords(password, password2);
 }
 
+/*
+* setErrorFor: Set the class name on input to change the styling
+* to reflect error status
+*/
 function setErrorFor(input, message) {
 	const formControl = input.parentElement.parentElement;
 	const small = formControl.querySelector('small');
@@ -57,16 +55,27 @@ function setErrorFor(input, message) {
 	small.innerText = message;
 }
 
+/*
+* setSuccessFor: Change the styling on the input error to reflect 
+* successful entry
+*/
 function setSuccessFor(input) {
 	console.log("here");
 	const formControl = input.parentElement.parentElement;
 	formControl.className = 'form-control success';
 }
-	
+
+/*
+* isEmail: Make sure email is valid
+*/
 function isEmail(email) {
 	return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email);
 }
 
+/*
+* checkPasswords: Check to make sure password is of sufficient strength
+* and also that password === password2
+*/
 function checkPasswords(password, password2) {
 	let passwordValue = password.value;
 	let password2Value = password2.value;
