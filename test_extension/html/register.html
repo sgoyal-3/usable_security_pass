@@ -95,6 +95,14 @@
                 color: #ccc;
                 font-size: 13px;
             }
+            
+            #password2-label {
+                margin-top: 4%;
+            }
+
+            #password-container {
+                margin-bottom: 20%;
+            }
 
             input {
                 font-family: 'Lucida Grande', Tahoma, Verdana, sans-serif;
@@ -210,14 +218,15 @@
             }
 
             .form-control small {
-                color: #e74c3c;
+                color: black;
                 position: absolute;
                 bottom: 0;
                 left: 0;
-                visibility: hidden;
+                visibility: visible;
             }
 
             .form-control.error small {
+                color: #e74c3c;
                 visibility: visible;
             }
         </style>
@@ -225,28 +234,38 @@
     <body>
         <div class="login">
             <h1>Welcome to MASHYPass</h1>
+            <h4>Create Your Account Below!</h4>
             <form id="form" method="post" action="">
 
-                <div id="form-control">
-                    <p><input id="email" type="text" name="login" value="" placeholder="Email" required></p>
+                <div class="form-control">
+                    <label for="email">Email</label>
+                    <p><input id="email" type="text" name="email" value="" placeholder="Email" required></p>
                     <i class="fas fa-check-circle"></i>
                     <i class="fas fa-exclamation-circle"></i>
-                    <small>Error message</small>
+                    <small></small>
                 </div>
 
-                <div id="form-control">
-                    <p><input id="password" type="password" name="password" value="" placeholder="Password" required></p>
+                <div class="form-control">
+                    <label for="password">Password</label>
+                    <p id="password-container">
+                        <input id="password" type="password" name="password" value="" placeholder="Password" required>
+                    </p>
                     <i class="fas fa-check-circle"></i>
                     <i class="fas fa-exclamation-circle"></i>
-                    <small>Error message</small>
+                    <small>
+                        We recommend your password have at least one of the following:
+                        lower case letters, upper case letters, numbers, and
+                        special characters, e.g. !, @, #, $, %
+                    </small>
                 </div>
 
                
-                <div id="form-control">
+                <div class="form-control">
+                    <label id="password2-label" for="password2">Confirm Password</label>
                     <p><input id="password2" type="password" name="password2" value="" placeholder="Confirm Password" required></p>
                     <i class="fas fa-check-circle"></i>
                     <i class="fas fa-exclamation-circle"></i>
-                    <small>Error message</small>
+                    <small></small>
                 </div>
 
                 <p class="remember_me">
@@ -256,7 +275,6 @@
                     </label>
                 </p>
               <p class="submit"><input id="submit" type="submit" name="commit" value="Create Account"></p>
-              <button>Submit</button>
             </form>
           </div>
     </body>
