@@ -26,34 +26,119 @@ var time_estimates;time_estimates={estimate_attack_times:function(e){var t,n,s,o
 },{}]},{},[4])(4)
 });
 
-window.addEventListener('load', () => {
-    let password = document.getElementById("password");
-    password.addEventListener('input', () => {
-        let passwordValue = password.value;
-        let zxcvbnResult = zxcvbn(passwordValue);
-        let score = zxcvbnResult.score;
-        let crackTimeDisplay = zxcvbnResult.crack_times_display.offline_fast_hashing_1e10_per_second;
-        let warning = zxcvbnResult.feedback.warning;
-        let suggestions = zxcvbnResult.feedback.suggestions;
-        
-        document.getElementById('password-display').innerHTML = `Current password: ${passwordValue}`;
 
-        let scoreElement = document.getElementById('score');
-        scoreElement.innerHTML = `Score: ${score}/4`;
 
-        let timeToCrackElement = document.getElementById('time-to-crack');
-        timeToCrackElement.innerHTML = `Time to crack: ${crackTimeDisplay}`;
+/*
+* provideMoreFeedback: Used if the crack time for a password is low
+* but there are no suggesstions being given by zxcvbn
+*/
+function provideMoreFeedback(passwordValue) {
+    
+    let commonAppends = ['00', '01', '02', '01', '12', '13', '21', '22', '23', '69',
+                        '77', '88', '99', '123']
 
-        let warningElement = document.getElementById('warning');
-        warningElement.innerHTML = `Warnings: ${warning}`
+    let isLowerCase = true;
+    let noNumbers = true;
+    let noSpecial = true;
+    for (var i = 0; i < passwordValue.length; i++) {
+        let c = passwordValue.charAt(i);
+        let asciiCode = passwordValue.charCodeAt(i);
 
-        let suggestionsElement = document.getElementById('suggestions');
-        let suggestionString = "Suggestions: ";
+        if (c !== c.toLowerCase()) {
+            isLowerCase = false;
+        }
+
+        if (!isNaN(c * 1)) {
+            noNumbers = false;
+        }
+
+        if (!(asciiCode >= 48 && asciiCode <= 57) && !(asciiCode >= 65
+            && asciiCode <= 90) && !(asciiCode >= 97 && asciiCode <= 122)) {
+                noSpecial = false;
+        }
+
+    }
+
+    if (isLowerCase || noNumbers || noSpecial) {
+        console.log(isLowerCase);
+        console.log(noNumbers);
+        console.log(noSpecial);
+        return `Try adding more capital letters, numbers and special characters`;
+    }
+
+    if (passwordValue.charAt(passwordValue.length - 1) === '!') {
+        return `Adding ! at the end of your password is very common. Try adding a special character
+                middle.`
+    }
+
+    if (passwordValue.charAt(0) == passwordValue.charAt(0).toUpperCase) {
+        return `Capitalizing the first letter of your password is very common. Try moving capital letters
+                to the middle`;
+    }
+
+    let passwordUsesCommonAppend = false;
+    for (var i = 0; i < commonAppends.length; i++) {
+        let end = passwordValue.length;
+        let start;
+        if (commonAppends[i].length === 2) {
+            start = end - 2;
+        } else {
+            start = end - 3;
+        }
+        console.log(passwordValue.substr(start, end), commonAppends[i]);
+
+        if (passwordValue.substr(start, end) === commonAppends[i]) {
+            return `Adding digits such as ${commonAppends[i]} at the end of your password is very common. Try 
+                    putting more digits in the middle`
+        }
+    }
+    return "";
+
+}
+
+
+/*
+* givePasswordFeedback: Gives a user feedback on their entered password
+*/
+function givePasswordFeedback(password) {
+    let passwordValue = password.value;
+    let zxcvbnResult = zxcvbn(passwordValue);
+    let score = zxcvbnResult.score;
+    let crackTime = zxcvbnResult.crack_times_seconds.offline_fast_hashing_1e10_per_second;
+    let crackTimeDisplay = zxcvbnResult.crack_times_display.offline_fast_hashing_1e10_per_second;
+    let warning = zxcvbnResult.feedback.warning;
+    let suggestions = zxcvbnResult.feedback.suggestions;
+    
+    document.getElementById('password-display').innerHTML = `Current password: ${passwordValue}`;
+
+    let scoreElement = document.getElementById('score');
+    scoreElement.innerHTML = `Score: ${score}/4`;
+
+    let timeToCrackElement = document.getElementById('time-to-crack');
+    timeToCrackElement.innerHTML = `Time to crack: ${crackTimeDisplay}`;
+
+    let warningElement = document.getElementById('warning');
+    warningElement.innerHTML = `Warnings: ${warning}`
+
+    let suggestionsElement = document.getElementById('suggestions');
+    let suggestionString = "Suggestions: ";
+
+    if (score < 4 && suggestions.length == 0) {
+        suggestionString += provideMoreFeedback(passwordValue);
+    } else {
         for (var i = 0; i < suggestions.length; i++) {
             suggestionString += `${suggestions[i]} \n`
         }
-        suggestionsElement.innerHTML = suggestionString;
+    }
 
+    suggestionsElement.innerHTML = suggestionString;
+
+}
+
+window.addEventListener('load', () => {
+    let password = document.getElementById("password");
+    password.addEventListener('input', () => {
+        givePasswordFeedback(password);
     })
 })
 
