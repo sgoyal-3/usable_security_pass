@@ -22,6 +22,10 @@ s.onload = function() {
 *
 * message: The message to send
 */
+/*
+This is all now done by the long-term connection 
+Keeping here in case we need it though
+*/
 function sendMessage(message) {
     chrome.runtime.sendMessage("bebffpohmffmkmbmanhdpepoineaegai", 
     message, response => {
@@ -62,6 +66,41 @@ function displayModal() {
     .then(() => {sendMessage({"modalOpened" : true})});
 }
 
-sendMessage("openModal?");
+
+//establish communication connection with background.js
+ var port = chrome.extension.connect({
+      name: "Sample Communication"
+ });
+
+ //test message
+ port.postMessage("Hi BackGround");
+
+ //previously was sendMessage(openModal?), moved/changed here
+ port.postMessage("openModal?");
+
+
+ /*
+ sendMessage() logic all moved here now
+ Need to refine the tabUrlChange logic, because right now it's always 
+ firing when tab url changes, but the idea is for it to only fire
+ when the url changes after log-in
+ */
+ port.onMessage.addListener(function(msg) {
+      console.log("message recieved" + msg);
+      if (msg.openModal === "true") {
+            console.log("openmodal is true");
+            displayModal();
+
+       } else if (msg = "tabUrlChange"){
+            console.log("URL change detected!");
+            displayModal();
+       }
+        else {
+            console.log("openmodal not true, putting listener on submit-button")
+            let submitButton = document.getElementById("submit-button");
+            submitButton.addEventListener("click", displayModal);
+        } 
+ });
+
 
 
