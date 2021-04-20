@@ -92,7 +92,7 @@ chrome.tabs.onUpdated.addListener((tabId, change, tab) => {
 
               old_url is only ever set to the url of a log in page (in above response logic),
               so we will always be comparing the new domain to the last seen login page
-            */
+            
               var old_url_domain = url_domain(old_url);
               var new_url_domain = url_domain(new_url);
               console.log(old_url_domain);
@@ -101,6 +101,11 @@ chrome.tabs.onUpdated.addListener((tabId, change, tab) => {
             if(old_url_domain == new_url_domain){
               openmodal_request = true;
             }
+
+            */
+
+            //actually just open it regardless of domain
+            openmodal_request = true;
 
             // //precaution? might keep this, we'll see
             // login_attempt = false;
