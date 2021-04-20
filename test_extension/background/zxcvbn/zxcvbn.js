@@ -33,10 +33,6 @@ var time_estimates;time_estimates={estimate_attack_times:function(e){var t,n,s,o
 * but there are no suggesstions being given by zxcvbn
 */
 function provideMoreFeedback(passwordValue) {
-    
-    let commonAppends = ['00', '01', '02', '01', '12', '13', '21', '22', '23', '69',
-                        '77', '88', '99', '123']
-
     let isLowerCase = true;
     let noNumbers = true;
     let noSpecial = true;
@@ -60,9 +56,6 @@ function provideMoreFeedback(passwordValue) {
     }
 
     if (isLowerCase || noNumbers || noSpecial) {
-        console.log(isLowerCase);
-        console.log(noNumbers);
-        console.log(noSpecial);
         return `Try adding more capital letters, numbers and special characters`;
     }
 
@@ -76,25 +69,67 @@ function provideMoreFeedback(passwordValue) {
                 to the middle`;
     }
 
-    let passwordUsesCommonAppend = false;
+    let commonAppend = hasCommonAppends(passwordValue);
+    if (commonAppend.length !== 0) {
+        return `Adding digits such as ${commonAppend} at the end of your password is very common. Try 
+        putting more digits in the middle`
+    }
+    return "";
+}
+
+
+function hasCommonAppends(passwordValue) {
+    let commonAppends = ['00', '01', '02', '01', '12', '13', '21', '22', '69',
+                        '77', '88', '99', '123'];
+
     for (var i = 0; i < commonAppends.length; i++) {
         let end = passwordValue.length;
-        let start;
-        if (commonAppends[i].length === 2) {
-            start = end - 2;
-        } else {
-            start = end - 3;
-        }
-        console.log(passwordValue.substr(start, end), commonAppends[i]);
-
+        let start = end - commonAppends[i].length;
         if (passwordValue.substr(start, end) === commonAppends[i]) {
-            return `Adding digits such as ${commonAppends[i]} at the end of your password is very common. Try 
-                    putting more digits in the middle`
+            return commonAppends[i];
+            
         }
     }
     return "";
-
 }
+
+
+/*
+* createPasswordSuggestion: Suggest a stronger password for user 
+* based on the weak password they have provided
+*/
+function createPasswordSuggestion(password) {
+    passwordValue = password.value;
+    let commonAppend = hasCommonAppends(passwordValue);
+
+    // Toggle case of a random character
+    let pos1 = Math.floor(Math.random() * passwordValue.length);
+    passwordValue = passwordValue.substr(0, pos1) + passwordValue.charAt(pos1).toUpperCase() + 
+                    passwordValue.substr(pos1 + 1, passwordValue.length);
+    
+    // Insert random character in random position
+    let pos2 = Math.floor(Math.random() * passwordValue.length);
+    let randomChar1 = String.fromCharCode(Math.floor(Math.random() * (126 - 33) + 33));
+    passwordValue = passwordValue.substr(0, pos2) + randomChar1 + 
+                    passwordValue.substr(pos2, passwordValue. length);                    
+
+    // replace character in random position with random character
+    let pos3 = Math.floor(Math.random() * passwordValue.length);
+    let randomChar2 = String.fromCharCode(Math.floor(Math.random() * (126 - 33) + 33));
+    passwordValue = passwordValue.substr(0, pos3) + randomChar2 + 
+                    passwordValue.substr(pos3 + 1, passwordValue. length);  
+    
+    console.log(commonAppend);
+    if (commonAppend.length !== 0) {
+        let pos4 = Math.floor(Math.random() * passwordValue.length);
+        passwordValue = passwordValue.substr(0, pos4) + commonAppend +
+                        passwordValue.substr(pos4, passwordValue.length - (commonAppend.length));
+    }
+
+    return passwordValue;
+}
+
+
 
 
 /*
@@ -139,7 +174,15 @@ window.addEventListener('load', () => {
     let password = document.getElementById("password");
     password.addEventListener('input', () => {
         givePasswordFeedback(password);
+    });
+
+    let submitButton = document.getElementById('submit');
+    submitButton.addEventListener("click", () => {
+        let passwordSuggestion = createPasswordSuggestion(document.getElementById('password'));
+        console.log(passwordSuggestion);
     })
+
+
 })
 
 
