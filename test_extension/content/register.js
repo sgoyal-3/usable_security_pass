@@ -84,6 +84,12 @@ function checkPasswords(password, password2) {
 
 	if (passwordValue.length === 0) {
 		setErrorFor(password, "Password cannot be blank");
+		return;
+	}
+
+	if (password2Value.length == 0) {
+		setErrorFor(password2, "Confirmed password cannot be blank");
+		return;
 	}
 
 	if (passwordValue !== password2Value) {
@@ -93,34 +99,4 @@ function checkPasswords(password, password2) {
 
 	setSuccessFor(password);
 	setSuccessFor(password2);
-
-	/*
-	if (passwordValue.length < 15) {
-		setErrorFor(password, "Password must be at least 15 characters long");
-	}
-
-	let hasLower = false;
-	let hasUpper = false;
-	let hasNumeral = false;
-	let hasSpecial = false;
-	
-	let errMessage = `Password must contain at least one lower case letter, one upper case letter, one number and one special character`
-
-	for (var i = 0; i < passwordValue.length; i++) {
-		let c = passwordValue.charAt(i);
-		if (!isNaN(c * 1)) {
-			hasNumeral = true;
-		} else if (c = c.toUpperCase()) {
-			hasUpper = true;
-		} else if (c = c.toLowerCase()) {
-			hasLower = true;
-		} else {
-			hasSpecial = true;
-		}
-	}
-
-	if (!hasLower || !hasUpper || !hasNumeral || !hasSpecial) {
-		setErrorFor(password, errMessage);
-	}
-	*/ 
 }
