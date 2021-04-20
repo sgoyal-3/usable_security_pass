@@ -1,3 +1,6 @@
+var bcrypt = require('bcryptjs');
+const axios = require('axios');
+
 /*
 * Wait until page has loaded, then add event listener to the 
 * "Create Account" button that will check the value of email
@@ -10,7 +13,25 @@ window.addEventListener('load', function() {
     const password2 = document.getElementById('password2');
     createAccount.addEventListener('click', e => {
         e.preventDefault();
-        checkInputs(email, password, password2);
+        var validInputs = checkInputs(email, password, password2);
+		if (validInputs) {
+
+			// Generate hash of password
+			var salt = bcrypt.genSaltSync(10);
+			var hash = bcrypt.hashSync(password.value, salt);
+
+			// Make a POST request to backend
+			axios.post('http://localhost:5000/api/register', {
+				email: `${email.value}`,
+				password: `${hash}`
+			})
+			.then(function(response) {
+				console.log(response);
+			})
+			.catch(function(error) {
+				console.log(error);
+			});
+		}
     });
 })
 
@@ -35,13 +56,15 @@ function checkInputs(email, password, password2) {
 
 	if(emailValue === '') {
 		setErrorFor(email, 'Email cannot be blank');
+		return false;
 	} else if (!isEmail(emailValue)) {
 		setErrorFor(email, 'Not a valid email');
+		return false;
 	} else {
 		setSuccessFor(email);
 	}
 	
-	checkPasswords(password, password2);
+	return checkPasswords(password, password2);
 }
 
 /*
@@ -84,19 +107,20 @@ function checkPasswords(password, password2) {
 
 	if (passwordValue.length === 0) {
 		setErrorFor(password, "Password cannot be blank");
-		return;
+		return false;
 	}
 
 	if (password2Value.length == 0) {
 		setErrorFor(password2, "Confirmed password cannot be blank");
-		return;
+		return false;
 	}
 
 	if (passwordValue !== password2Value) {
 		setErrorFor(password2, "Passwords do not match");
-		return;
+		return false;
 	}
 
 	setSuccessFor(password);
 	setSuccessFor(password2);
+	return true;
 }

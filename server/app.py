@@ -1,4 +1,5 @@
 from flask import current_app, g, Flask, flash, jsonify, redirect, render_template, request, session, Response
+from flask_cors import CORS, cross_origin
 import logging
 import json
 import requests
@@ -6,6 +7,9 @@ import datetime
 from db import DB, KeyNotFound, BadRequest
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'this is a secret key'
+app.config['CORS_HEADERS'] = 'Content-Type'
+cors = CORS(app, resources={r"/api/register" : {"origins" : "chrome-extension://bebffpohmffmkmbmanhdpepoineaegai"}})
 db = DB()
 
 # Hello world route to test connection
@@ -16,6 +20,7 @@ def index():
 
 # user registration
 @app.route("/api/register", methods=["POST"])
+@cross_origin(origin='chrome-extension://bebffpohmffmkmbmanhdpepoineaegai', headers=['Content- Type','Authorization'])
 def register_user():
     """
     Adds a new user to the database
