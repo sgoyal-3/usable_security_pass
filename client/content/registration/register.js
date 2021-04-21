@@ -1,5 +1,6 @@
 var bcrypt = require('bcryptjs');
 const axios = require('axios');
+var passwordModule = require('./password.js')
 
 /*
 * Wait until page has loaded, then add event listener to the 
@@ -14,6 +15,7 @@ window.addEventListener('load', function() {
     createAccount.addEventListener('click', e => {
         e.preventDefault();
         var validInputs = checkInputs(email, password, password2);
+		console.log(passwordModule.createPasswordSuggestion(password));
 		if (validInputs) {
 
 			// Generate hash of password
@@ -45,15 +47,7 @@ window.addEventListener('load', function() {
 function checkInputs(email, password, password2) {
 	// trim to remove the whitespaces
 	const emailValue = email.value.trim();
-	const passwordValue = password.value.trim();
-	const password2Value = password2.value.trim();
 	
-	console.log({
-		"email": `${emailValue}`,
-		"passwordValue" : `${passwordValue}`,
-		"password2Value" : `${password2Value}`
-	})
-
 	if(emailValue === '') {
 		setErrorFor(email, 'Email cannot be blank');
 		return false;
@@ -83,7 +77,6 @@ function setErrorFor(input, message) {
 * successful entry
 */
 function setSuccessFor(input) {
-	console.log("here");
 	const formControl = input.parentElement.parentElement;
 	formControl.className = 'form-control success';
 	const small = formControl.querySelector('small');
@@ -102,8 +95,8 @@ function isEmail(email) {
 * and also that password === password2
 */
 function checkPasswords(password, password2) {
-	let passwordValue = password.value;
-	let password2Value = password2.value;
+	let passwordValue = password.value.trim();
+	let password2Value = password2.value.trim();
 
 	if (passwordValue.length === 0) {
 		setErrorFor(password, "Password cannot be blank");
