@@ -40,6 +40,7 @@ class BadRequest(Exception):
 class DB:
     def __init__(self):
         self.users = {} # Holds all user data, indexed by user's email
+        self.user_vaults = {} # Holds all user vault data, indexed by user's email
     
     def add_user(self, post_body):
         '''

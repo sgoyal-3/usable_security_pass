@@ -4,8 +4,10 @@ import logging
 import json
 import requests
 import datetime
+from log import errors as err
 from db import DB, KeyNotFound, BadRequest
 
+# App config
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'this is a secret key'
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -27,7 +29,7 @@ def register_user():
     """
     post_body = request.json
     if not post_body: 
-        return Response(response="No post body", status=400)
+        return Response(response=err.MISSING_REQUEST_BODY, status=400)
     try:
         db.add_user(post_body)
     except BadRequest as e:
@@ -41,21 +43,48 @@ def register_user():
 @cross_origin(origin='chrome-extension://bebffpohmffmkmbmanhdpepoineaegai', headers=['Content- Type','Authorization'])
 def login_user():
     """
-    Checks is a user's provided credentials are correct
+    Return user's password based on their email
     """
     email = request.args.get('email')
     if not email:
-        logging.error(" Missing required URL parameters")
-        return Response(response=" Missing required URL parameters", status=400)
+        logging.error(err.MISSING_URL_PARAMS)
+        return Response(response=err.MISSING_URL_PARAMS, status=400)
     try:
         return jsonify({"password" : db.fetch_user_password(email)}) 
     except BadRequest as e:
-        logging.error("email not present in body")
-        return Response(response=e.message, status=400)
+        logging.error(err.MISSING_REQUEST_PARAM)
+        return Response(response=err.MISSING_REQUEST_PARAM, status=400)
     except KeyNotFound as e:
-        logging.error("email not found in database")
+        logging.error(err.EMAIL_NOT_FOUND)
+        return Response(response=err.EMAIL_NOT_FOUND, status=400)
+    return Response(status=400)
+
+
+# add a new record to vault
+@app.route("/api/vault", methods=["POST"])
+@cross_origin(origin='chrome-extension://bebffpohmffmkmbmanhdpepoineaegai', headers=['Content- Type','Authorization'])
+def add_vault_entry():
+    """
+    Add a new vault entry to user's list of vault entries
+    """
+    email = request.args.get('email')
+    request_body = request.json
+    if not email:
+        logging.error(err.MISSING_URL_PARAMS)
+        return Response(status=400)
+    if not request_body:
+        logging.error(err.MISSING_REQUEST_BODY)
+        return Response(status=400)
+    try:
+        db.add_vault_entry(email, request_body)
+    except BadRequest as e:
         return Response(response=e.message, status=400)
     return Response(status=400)
+    
+
+
+
+
 
 
 
