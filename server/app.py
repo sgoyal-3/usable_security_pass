@@ -17,7 +17,7 @@ db = DB()
 # Hello world route to test connection
 @app.route("/")
 def index():
-    return "Hello World!"
+    return "Hello from a Heroku server!"
 
 
 # user registration
