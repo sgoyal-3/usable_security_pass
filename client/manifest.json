@@ -7,7 +7,8 @@
       "js": ["content/content.mjs"]
     }],
     "permissions": [
-      "tabs", "activeTab"
+      "tabs", "activeTab", "http://*/", "https://*/", "notifications", 
+      "chrome-extension://aofelgdcnljcjeejddhcknappobidfch/html/popup.html"
     ],
     "browser_action": {
       "default_popup" : "html/popup.html"
@@ -21,6 +22,6 @@
       "matches" : ["*://*.stackoverflow.com/*"],
       "accepts_tls_channel_id" : false
     },
-    "web_accessible_resources":["content/script.mjs", 
-      "html/modal.html", "content/popup.js", "content/register.js"]
+    "web_accessible_resources":["content/script.mjs", "html/popup.html", 
+      "html/modal.html", "content/popup.js", "content/register.js", "static/login.js"]
   }

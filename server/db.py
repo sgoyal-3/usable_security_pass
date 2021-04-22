@@ -58,19 +58,12 @@ class DB:
         self.users[user_email] = user_password
 
     
-    def verify_user_credentials(self, post_body):
+    def fetch_user_password(self, email):
         '''
         Check if user credentials given in post_body matches records in self.users
         '''
-        try:
-            user_email = post_body["email"]
-            user_password = post_body["password"]
-        except KeyError as e:
-            raise BadRequest(message=" Required attribute is missing.")
-
-        if not user_email in self.users:
-            raise KeyNotFound(message=" User with email: {} is not present".format(user_email))
-
-        return self.users[user_email] == user_password        
+        if not email in self.users:
+            raise KeyNotFound(message=" User with email: {} is not present".format(email))
+        return self.users[email]        
 
 

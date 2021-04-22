@@ -38,18 +38,22 @@ def register_user():
 
 # user login
 @app.route("/api/login", methods=["GET"])
+@cross_origin(origin='chrome-extension://bebffpohmffmkmbmanhdpepoineaegai', headers=['Content- Type','Authorization'])
 def login_user():
     """
     Checks is a user's provided credentials are correct
     """
-    body = request.json
-    if not body:
-        return Response(response="No body", status=400)
+    email = request.args.get('email')
+    if not email:
+        logging.error(" Missing required URL parameters")
+        return Response(response=" Missing required URL parameters", status=400)
     try:
-        return jsonify({"validated" : db.verify_user_credentials(body)}) 
+        return jsonify({"password" : db.fetch_user_password(email)}) 
     except BadRequest as e:
+        logging.error("email not present in body")
         return Response(response=e.message, status=400)
     except KeyNotFound as e:
+        logging.error("email not found in database")
         return Response(response=e.message, status=400)
     return Response(status=400)
 
