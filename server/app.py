@@ -38,10 +38,10 @@ def register_user():
     return Response(status=201)
 
 
-# user login
+# Route to get user's password
 @app.route("/api/login", methods=["GET"])
 @cross_origin(origin='chrome-extension://bebffpohmffmkmbmanhdpepoineaegai', headers=['Content- Type','Authorization'])
-def login_user():
+def fetch_user_password():
     """
     Return user's password based on their email
     """
@@ -55,8 +55,29 @@ def login_user():
         logging.error(err.MISSING_REQUEST_PARAM)
         return Response(response=err.MISSING_REQUEST_PARAM, status=400)
     except KeyNotFound as e:
+
         logging.error(err.EMAIL_NOT_FOUND)
         return Response(response=err.EMAIL_NOT_FOUND, status=400)
+    return Response(status=400)
+
+
+# Route that logs in user on server end
+@app.route("/api/login", methods=["PUT"])
+@cross_origin(origin='chrome-extension://bebffpohmffmkmbmanhdpepoineaegai', headers=['Content- Type','Authorization'])
+def login_user():
+    """
+    Login the user based on email
+    """
+    email = request.args.get('email')
+    if not email:
+        logging.error(err.MISSING_URL_PARAMS)
+    try:
+        db.login_user(email)
+        return Response(status=201)
+    except KeyNotFound as e:
+        logging.error(err.EMAIL_NOT_FOUND)
+        return Response(response=e.message, status=400)
+    
     return Response(status=400)
 
 
@@ -77,12 +98,31 @@ def add_vault_entry():
         return Response(status=400)
     try:
         db.add_vault_entry(email, request_body)
+        return Response(status=201)
     except BadRequest as e:
         return Response(response=e.message, status=400)
     return Response(status=400)
-    
 
 
+# Retrieve a recrod from the vault
+@app.route("/api/vault", methods=["GET"])
+@cross_origin(origin='chrome-extension://bebffpohmffmkmbmanhdpepoineaegai', headers=['Content- Type','Authorization'])
+def fetch_vault_entry():
+    """
+    Fetch a vault entry from the user's vault
+    """
+    email = request.args.get('email')
+    url = request.args.get('url')
+    if not email or not url:
+        logging.error(err.MISSING_URL_PARAMS)
+        return Response(status=400)
+    try:
+        return jsonify(db.fetch_vault_entry(email, url))
+    except BadRequest as e:
+        return Response(response=e.message, status=400)
+    except KeyNotFound as e:
+        return Response(response=e.message, status=400)
+    return Response(status=400)
 
 
 

@@ -36,6 +36,39 @@ class BadRequest(Exception):
         return rv
 
 
+class VaultEntry:
+
+    def __init__(self, url, username, password):
+        self.url = url
+        self.username = username
+        self.password = password
+    
+    def update(self, new_url=None, new_username=None, new_password=None):
+        if new_url is not None:
+            self.url = new_url
+        if new_username is not None:
+            self.username = new_username
+        if new_password is not None:
+            self.password = new_password
+    
+    def to_dict(self):
+        return {"url" : self.url, "username" : self.username, "password" : self.password}
+
+
+# Defines a user entity
+class User:
+
+    def __init__(self, email, password):
+        self.email = email
+        self.password = password
+        self.vault = {}
+        self.registered = True
+        self.logged_in = False
+    
+    def log_in(self):
+        self.logged_in = True
+
+
 # Stand-in local database that we will use until we integrate MySQL
 class DB:
     def __init__(self):
@@ -49,14 +82,14 @@ class DB:
         try:
             user_email = post_body["email"]
             user_password = post_body["password"]
-        except KeyError as e:
+        except KeyError:
             raise BadRequest(message=" Required attribute is missing.")
         
         if user_email in self.users:
             already_present_msg = " User with email: {} is already present".format(user_email)
             raise BadRequest(message=already_present_msg)
 
-        self.users[user_email] = user_password
+        self.users[user_email] = User(user_email, user_password)
 
     
     def fetch_user_password(self, email):
@@ -65,6 +98,54 @@ class DB:
         '''
         if not email in self.users:
             raise KeyNotFound(message=" User with email: {} is not present".format(email))
-        return self.users[email]        
+
+        return self.users[email].password
+    
+
+    def login_user(self, email):
+        '''
+        Login the user whose email is equal to email
+        '''
+        if not email in self.users:
+            raise KeyNotFound(message=" User with email: {} is not present".format(email))
+
+        self.users[email].log_in()
+    
+
+    def add_vault_entry(self, email, post_body):
+        '''
+        Add a new entry to a user's vault
+        '''
+        if not email in self.users:
+            raise KeyNotFound(message=" User with email: {} is not present".format(email))
+        
+        try:
+            url = post_body['url']
+            username = post_body['username']
+            password = post_body['password']
+        except KeyError:
+            raise BadRequest(message="Required attributes are missing")
+        
+        self.users[email].vault[url] = VaultEntry(url, username, password)
+    
+
+    def fetch_vault_entry(self, email, url):
+        '''
+        Fetch a vault entry from the user's vault
+        '''
+        if not email in self.users:
+            raise KeyNotFound(message=" User with email: {} is not present".format(email))
+        
+        if not url in self.users[email].vault:
+            raise KeyNotFound(message=" Vault with url: {} is not present".format(url))
+        
+        return self.users[email].vault[url].to_dict()
+        
+
+
+
+
+
+
 
 
