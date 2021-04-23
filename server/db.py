@@ -67,9 +67,13 @@ class User:
         self.vault = {}
         self.registered = True
         self.logged_in = False
+        self.session_id = None
     
     def log_in(self):
         self.logged_in = True
+    
+    def set_session_id(self, session_id):
+        self.session_id = session_id
 
 
 # Stand-in local database that we will use until we integrate MySQL
@@ -103,19 +107,24 @@ class DB:
             raise KeyNotFound(message=" User with email: {} is not present".format(email))
         
         password = self.users[email].password
-        session_id = session.generate_session_id(password.encode('utf-8'))    
-
-        return (password, session_id)
+        return password
     
 
-    def login_user(self, email):
+    def login_user(self, email, token):
         '''
-        Login the user whose email is equal to email
+        Login the user whose email is equal to email and generate
+        a session-id for the user
         '''
         if not email in self.users:
             raise KeyNotFound(message=" User with email: {} is not present".format(email))
+        
+        if not token == "oPB6jRIlzTSqO9J4MgY3":
+            raise BadRequest(message=" Invalid token")
 
         self.users[email].log_in()
+        session_id = session.generate_session_id(self.users[email].password.encode('utf-8'))
+        self.users[email].set_session_id(session_id)
+        return session_id
     
 
     def add_vault_entry(self, email, post_body):

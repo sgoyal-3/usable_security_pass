@@ -26748,9 +26748,20 @@ window.addEventListener('load', function() {
         // Get user's hashed password from server
         axios.get(`http://localhost:5000/api/login?email=${email}`)
         .then(function(response) {
-            let dbPassword = response.data.password;
+            console.log(response)
+            let dbPassword = response.data;
             if (bcrypt.compareSync(password, dbPassword)) {
                 console.log("Access Granted");
+                let token = "oPB6jRIlzTSqO9J4MgY3";
+                axios.put(`http://localhost:5000/api/login?email=${email}&token=${token}`)
+                .then(function(resp) {
+                    console.log(resp);
+                    document.cookie = `session-id=${resp.data}; path=/`;
+                    console.log(document.cookie);
+                })
+                .catch(function(error) {
+                    console.log(error);
+                })
             } else {
                 console.log("Access Denied");
             }

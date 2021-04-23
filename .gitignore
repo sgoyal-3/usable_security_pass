@@ -1,3 +1,4 @@
 server/venv
 server/__pycache__
 server/log/__pycache__
+server/security/__pycache__

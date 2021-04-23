@@ -50,9 +50,8 @@ def fetch_user_password():
         logging.error(err.MISSING_URL_PARAMS)
         return Response(response=err.MISSING_URL_PARAMS, status=400)
     try:
-        (password, session_id) = db.fetch_user_password(email)
+        password = db.fetch_user_password(email)
         response = Response(status=201, response=password)
-        response.set_cookie('session-id', value=session_id)
         return response
     except BadRequest as e:
         logging.error(err.MISSING_REQUEST_PARAM)
@@ -72,13 +71,17 @@ def login_user():
     Login the user based on email
     """
     email = request.args.get('email')
-    if not email:
+    token = request.args.get('token')
+    if not email or not token:
         logging.error(err.MISSING_URL_PARAMS)
     try:
-        db.login_user(email)
-        return Response(status=201)
+        session_id = db.login_user(email, token)
+        return Response(response=session_id, status=201)
     except KeyNotFound as e:
         logging.error(err.EMAIL_NOT_FOUND)
+        return Response(response=e.message, status=400)
+    except BadRequest as e:
+        logging.error(e.message)
         return Response(response=e.message, status=400)
     
     return Response(status=400)
