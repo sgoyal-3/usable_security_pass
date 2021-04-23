@@ -1,3 +1,6 @@
+import security.session as session
+
+
 # helper function that converts query result to json, after cursor has executed query
 def to_json(cursor):
     results = cursor.fetchall()
@@ -98,8 +101,11 @@ class DB:
         '''
         if not email in self.users:
             raise KeyNotFound(message=" User with email: {} is not present".format(email))
+        
+        password = self.users[email].password
+        session_id = session.generate_session_id(password.encode('utf-8'))    
 
-        return self.users[email].password
+        return (password, session_id)
     
 
     def login_user(self, email):

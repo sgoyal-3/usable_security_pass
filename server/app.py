@@ -50,7 +50,10 @@ def fetch_user_password():
         logging.error(err.MISSING_URL_PARAMS)
         return Response(response=err.MISSING_URL_PARAMS, status=400)
     try:
-        return jsonify({"password" : db.fetch_user_password(email)}) 
+        (password, session_id) = db.fetch_user_password(email)
+        response = Response(status=201, response=password)
+        response.set_cookie('session-id', value=session_id)
+        return response
     except BadRequest as e:
         logging.error(err.MISSING_REQUEST_PARAM)
         return Response(response=err.MISSING_REQUEST_PARAM, status=400)
