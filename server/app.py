@@ -95,15 +95,16 @@ def add_vault_entry():
     Add a new vault entry to user's list of vault entries
     """
     email = request.args.get('email')
+    session_id = request.args.get('session-id')
     request_body = request.json
-    if not email:
+    if not email or not session_id:
         logging.error(err.MISSING_URL_PARAMS)
         return Response(status=400)
     if not request_body:
         logging.error(err.MISSING_REQUEST_BODY)
         return Response(status=400)
     try:
-        db.add_vault_entry(email, request_body)
+        db.add_vault_entry(email, session_id, request_body)
         return Response(status=201)
     except BadRequest as e:
         return Response(response=e.message, status=400)

@@ -21,6 +21,7 @@ window.addEventListener('load', function() {
                 .then(function(resp) {
                     console.log(resp);
                     document.cookie = `session-id=${resp.data}; path=/`;
+                    document.cookie = `email=${email}; path=/`;
                     console.log(document.cookie);
                 })
                 .catch(function(error) {

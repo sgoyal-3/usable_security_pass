@@ -127,7 +127,7 @@ class DB:
         return session_id
     
 
-    def add_vault_entry(self, email, post_body):
+    def add_vault_entry(self, email, session_id, post_body):
         '''
         Add a new entry to a user's vault
         '''
@@ -140,6 +140,10 @@ class DB:
             password = post_body['password']
         except KeyError:
             raise BadRequest(message="Required attributes are missing")
+        
+        user = self.user[email]
+        if not user.session_id == session_id:
+            raise BadRequest(message="Invalid session_id")
         
         self.users[email].vault[url] = VaultEntry(url, username, password)
     
