@@ -1,4 +1,6 @@
 import security.session as session
+import base64
+import datetime
 
 
 # helper function that converts query result to json, after cursor has executed query
@@ -68,12 +70,14 @@ class User:
         self.registered = True
         self.logged_in = False
         self.session_id = None
+        self.session_expires = None
     
     def log_in(self):
         self.logged_in = True
     
     def set_session_id(self, session_id):
         self.session_id = session_id
+        self.session_expires = datetime.datetime.now() + datetime.timedelta(minutes = 30)
 
 
 # Stand-in local database that we will use until we integrate MySQL
@@ -141,23 +145,30 @@ class DB:
         except KeyError:
             raise BadRequest(message="Required attributes are missing")
         
-        user = self.user[email]
-        if not user.session_id == session_id:
-            raise BadRequest(message="Invalid session_id")
+        user = self.users[email]
+        encoded = session_id.encode('utf-8')
+        if not user.session_id == encoded:
+            raise BadRequest(message="Invalid session_id: received {}, expected {}".format(encoded, user.session_id))
+        
         
         self.users[email].vault[url] = VaultEntry(url, username, password)
     
 
-    def fetch_vault_entry(self, email, url):
+    def fetch_vault_entry(self, email, url, session_id):
         '''
         Fetch a vault entry from the user's vault
         '''
         if not email in self.users:
             raise KeyNotFound(message=" User with email: {} is not present".format(email))
-        
+        user = self.users[email]
+
         if not url in self.users[email].vault:
             raise KeyNotFound(message=" Vault with url: {} is not present".format(url))
         
+        if not session_id.encode('utf-8') == user.session_id:
+            raise BadRequest(message=" Invalid session_id") 
+
+
         return self.users[email].vault[url].to_dict()
         
 

@@ -120,11 +120,12 @@ def fetch_vault_entry():
     """
     email = request.args.get('email')
     url = request.args.get('url')
-    if not email or not url:
+    session_id = request.args.get('session-id')
+    if not email or not url or not session_id:
         logging.error(err.MISSING_URL_PARAMS)
         return Response(status=400)
     try:
-        return jsonify(db.fetch_vault_entry(email, url))
+        return jsonify(db.fetch_vault_entry(email, url, session_id))
     except BadRequest as e:
         return Response(response=e.message, status=400)
     except KeyNotFound as e:
