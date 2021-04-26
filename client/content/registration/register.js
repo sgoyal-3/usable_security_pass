@@ -23,12 +23,32 @@ window.addEventListener('load', function() {
 			var hash = bcrypt.hashSync(password.value, salt);
 
 			// Make a POST request to backend
-			axios.post('http://localhost:5000/api/register', {
+			axios.post('https://mashypass-app.herokuapp.com/api/register', {
 				email: `${email.value}`,
 				password: `${hash}`
 			})
 			.then(function(response) {
 				console.log(response);
+				if(response.status == 201){
+					console.log("registered successfully");
+
+					//this code taken from login.js - go through login process automatically
+					//upon registration
+					let token = "oPB6jRIlzTSqO9J4MgY3";
+	                axios.put(`https://mashypass-app.herokuapp.com/api/login?email=${email}&token=${token}`)
+	                .then(function(resp) {
+	                    console.log(resp);
+	                    document.cookie = `session-id=${resp.data}; path=/`;
+	                    document.cookie = `email=${email}; path=/`;
+	                    console.log(document.cookie);
+	                })
+	                .catch(function(error) {
+	                    console.log(error);
+	                })
+
+
+					window.location.replace("/html/registration_successful.html");
+				}
 			})
 			.catch(function(error) {
 				console.log(error);

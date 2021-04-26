@@ -1,7 +1,30 @@
 /*
+This version of the content script must be converted to a "watchified" form via the command
+ watchify client/content/content-base.js -o client/content/content.js -v
+
+
 This is the driver code for the content script. This is what is run on every page
 whose URL fits the matches clause specified in manifest.json
 */
+
+
+var CryptoJS = require("crypto-js");
+var axios = require('axios')
+
+
+function getCookieValue(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+var email = "";
+var session_id = "";
+
+
+const event = new Event('build');
+
+
 
 //establish communication connection with background.js
  var port = chrome.extension.connect({
@@ -19,8 +42,39 @@ whose URL fits the matches clause specified in manifest.json
         console.log(msg.password);
         displayModal(msg.username, msg.password);
       }
+      if(typeof(msg.email) != 'undefined' && typeof(msg.session_id) != 'undefined'){
+        email = msg.email;
+        session_id = msg.session_id;
+        console.log("Email and session_ids retrieved");
+        // Dispatch the event.
+        window.dispatchEvent(event);
+      }
+      // if(typeof(msg.registration_point) != 'undefined'){
+      //   //fill in registration point field in registration-successful.html if that is the current page
+      //   console.log("got registration point and it is: ");
+      //   console.log(msg.registration_point);
+      // }
  });
 
+
+
+// Listen for the event.
+window.addEventListener('build', function (e) { 
+        console.log('hi');
+       let url = document.location;
+        console.log(session_id);
+        console.log(email);
+        console.log("sending axios now");
+        axios.get(`https://mashypass-app.herokuapp.com/api/vault?session-id=${session_id}&email=${email}&url=${url}`, {})
+        .then(function (response) {
+            console.log(response);
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
+        
+
+}, false);
 
 
  /*
@@ -57,10 +111,17 @@ function search(){
 
     //if username and password exists, put listener on submit button
     if(password_exists && username_exists){
+
+        port.postMessage("Cookies pls");
+
+     
+
         /*
+
+        COMMENT THIS BACK AFTER
         trying to find a way for it detect when form is submitted via enter
         key as well as click, but it doesn't seem to work
-        */
+        
         console.log("putting listener on login-form");
         var submit = document.getElementById("login-form");
         submit.addEventListener("submit", function() 
@@ -79,11 +140,12 @@ function search(){
             var password_contents = document.getElementById("password").value;
             sendCreds(username_contents, password_contents, window.location.href); 
         });
+
+        */
     }
     
 
 }
-
 
 
 //sends credentials and info to background.js
@@ -128,6 +190,15 @@ function displayModal(username, password) {
     })
 }
 
+
+/*
+request registration point if current page is registration_successul.html
+*/
+// console.log("current relative path in window is: ");
+// console.log(window.location.pathname+window.location.search);
+// if(window.location.pathname+window.location.search == "html/registration_successul.html"){
+//     port.postMessage("Registration point request");
+// }
 
 
 

@@ -1,50 +1,51 @@
-/*
-* Send the user to the register page if they click the "Create an Account link"
-*/
-window.addEventListener('load', function() {
-    let registerLink = document.getElementById("register-link");
-    registerLink.addEventListener('click', function() {
-        chrome.tabs.create({url: "html/register.html"});
-    })
-})
-
-
-
-/*
-testing getting page DOM. I know it's weird to have this here and not 
- in content.js, but it works quite well
- */
-window.addEventListener('DOMContentLoaded', (event) => {
-    console.log("Popup DOM fully loaded and parsed");
-
-    function modifyDOM() {
-        //You can play with your DOM here or check URL against your regex
-        console.log('Tab script:');
-        console.log(document.body);
-        return document.body.innerHTML;
-    }
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
     
-    /*
-    //We have permission to access the activeTab, so we can call chrome.tabs.executeScript:
-    chrome.tabs.executeScript({
-        code: '(' + modifyDOM + ')();' //argument here is a string but function.toString() returns function's code
-    }, (results) => {
-        //Here we have just the innerHTML and not DOM structure
-        console.log('Popup script:')
-        //console.log(results[0]);
-    });
-    */
-});
 
 
-// //communication with background.js, will be necessary for sending DOM 
- // var port = chrome.extension.connect({
- //      name: "Sample Communication"
- // });
- // port.postMessage("Hi BackGround from popup");
- // port.onMessage.addListener(function(msg) {
- //      console.log("message recieved" + msg);
- // });
+//establish communication connection with background.js
+ var port = chrome.extension.connect({
+      name: "Sample Communication"
+ });
+
+
+
+// if session saved, redirect to login_succsesful page
+window.addEventListener('load', function() {
+    if(document.cookie == ""){
+        console.log("no cookies set");
+    } else{
+        console.log("cookies set");
+
+         //can take these things out later maybe
+
+        //send session id and email to background.js so content.js can access it 
+        var email = getCookie("email");
+        var session_id = getCookie("session-id");
+        port.postMessage({email: email, session_id: session_id});
+        console.log("Sent email and sesion_id");
+
+
+        window.location.replace("/html/login_successful.html");
+    }
+
+
+   
+
+
+
+})
+
+
+
+
+
+
+
+
 
 /*
 * Send the user to the register page if they click the "Create an Account link"
@@ -52,8 +53,26 @@ window.addEventListener('DOMContentLoaded', (event) => {
 window.addEventListener('load', function() {
     let registerLink = document.getElementById("register-link");
     registerLink.addEventListener('click', function() {
+        //redirect
         chrome.tabs.create({url: "html/register.html"});
     })
+
+
 })
+
+
+/*
+* Send the user to the home page if they click the home link
+*/
+window.addEventListener('load', function() {
+    let registerLink = document.getElementById("home-link");
+    registerLink.addEventListener('click', function() {
+        //redirect
+        chrome.tabs.create({url: "html/home.html"});
+    })
+
+
+})
+
 
 

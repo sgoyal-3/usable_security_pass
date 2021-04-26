@@ -38,32 +38,33 @@ chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => 
 
 
 /*
+Uh idk if we need this
 communication with content.js and popup.js. Both content.js and popup.js
 will communicate on the same port, so we should make sure to differentiate
 them if it becomes necessary
 */
- chrome.extension.onConnect.addListener(function(port) {
-      console.log("Connected .....");
+ // chrome.extension.onConnect.addListener(function(port) {
+ //      console.log("Connected .....");
 
 
-      port.onMessage.addListener(function(msg) {
-           console.log("message recieved" + msg);
-           console.log(msg);
+ //      port.onMessage.addListener(function(msg) {
+ //           console.log("message recieved" + msg);
+ //           console.log(msg);
 
-           if (msg.modalOpened) {
-                modalOpened = msg.modalOpened;
-                port.postMessage('modal has been opened');
-            } else if (msg == "openModal?") {
-                port.postMessage("got message openModal?");
-                port.postMessage({'openModal' : `${modalOpened}`})
-            } else {
-                port.postMessage('pong');
-            }
+ //           if (msg.modalOpened) {
+ //                modalOpened = msg.modalOpened;
+ //                port.postMessage('modal has been opened');
+ //            } else if (msg == "openModal?") {
+ //                port.postMessage("got message openModal?");
+ //                port.postMessage({'openModal' : `${modalOpened}`})
+ //            } else {
+ //                port.postMessage('pong');
+ //            }
 
 
-           port.postMessage("Hi content.js");
-      });
- })
+ //           port.postMessage("Hi content.js");
+ //      });
+ // })
 
 
 /*
@@ -90,7 +91,11 @@ let login_attempt = false;
 var username = "";
 var password = "";
 var old_url = "";
-var new_url = ""
+var new_url = "";
+var registration_point = "";
+
+var email = "";
+var session_id = "";
 
 
 
@@ -113,6 +118,8 @@ function url_domain(data) {
 
       port.onMessage.addListener(function(msg) {
            console.log("message recieved: " + msg);
+           console.log(msg.email);
+           console.log(msg.session_id);
 
            if (typeof(msg.username) != 'undefined'){
               /* 
@@ -126,6 +133,8 @@ function url_domain(data) {
               console.log(username);
               console.log(password);
               console.log(old_url);
+              console.log(old_url);
+              console.log(new_url);
             }
             else if (msg == "modalclosed") {
                 /*once the modal has been closed by the user, we should no
@@ -133,6 +142,15 @@ function url_domain(data) {
                 */
                 login_attempt = false;
             } 
+            else if(typeof(msg.email) != 'undefined' && typeof(msg.session_id) != 'undefined'){
+              email = msg.email;
+              session_id = msg.session_id;
+              console.log(email);
+              console.log(session_id);
+            }
+            else if(msg == "Cookies pls"){
+              port.postMessage({email:email, session_id:session_id});
+            }
 
       });
  })
