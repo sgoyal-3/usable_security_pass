@@ -31,12 +31,6 @@ window.addEventListener('load', function() {
 
         window.location.replace("/html/login_successful.html");
     }
-
-
-   
-
-
-
 })
 
 

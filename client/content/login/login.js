@@ -7,6 +7,27 @@ const axios = require('axios');
  });
 
 
+ /*
+ * getSessionId: make repeated requests to server in order to retrieve 
+ * session-id token
+ */
+function getSessionId(email){
+    let token = "oPB6jRIlzTSqO9J4MgY3";
+    axios.put(`https://mashypass-app.herokuapp.com/api/login?email=${email}&token=${token}`)
+    .then(function(resp) {
+        console.log(resp);
+        document.cookie = `session-id=${resp.data}; path=/`;
+        document.cookie = `email=${email}; path=/`;
+        console.log(document.cookie);
+        //send session id and email to background.js so content.js can access it 
+        port.postMessage({email: email, session_id: resp.data})
+    })
+    .catch(function(error) {
+        console.log(error);
+        setTimeout(() => getSessionId(email), 500);
+    })
+}
+
 
 
 window.addEventListener('load', function() {
@@ -24,27 +45,12 @@ window.addEventListener('load', function() {
             let dbPassword = response.data;
             if (bcrypt.compareSync(password, dbPassword)) {
                 console.log("Access Granted");
-                let token = "oPB6jRIlzTSqO9J4MgY3";
-
-                 //send session id and email to background.js so content.js can access it 
-                port.postMessage({email: email, session_id: resp.data})
+                
+               
 
                 //display login success
                 window.location.replace("/html/login_successful.html");
-
-
-                //this keeps saying User with email: rookiemail@comcast.net is not present even when i get access granted
-                axios.put(`https://mashypass-app.herokuapp.com/api/login?email=${email}&token=${token}`)
-                .then(function(resp) {
-                    console.log(resp);
-                    document.cookie = `session-id=${resp.data}; path=/`;
-                    document.cookie = `email=${email}; path=/`;
-                    console.log(document.cookie);
-
-                })
-                .catch(function(error) {
-                    console.log(error);
-                })
+                getSessionId(email); // Get our session-id tokens
             } else {
                 console.log("Access Denied");
             }
