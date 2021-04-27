@@ -6,18 +6,46 @@ import requests
 import datetime
 from log import errors as err
 from db import DB, KeyNotFound, BadRequest
+import pymongo
+import urllib
+from pprint import pprint
 
 # App config
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'this is a secret key'
 app.config['CORS_HEADERS'] = 'Content-Type'
 cors = CORS(app, resources={r"/api/register" : {"origins" : "chrome-extension://bebffpohmffmkmbmanhdpepoineaegai"}})
-db = DB()
+
+# Databse config
+mongo_uri = "mongodb+srv://user-2:550Maranello@learning-cluster.tpidq.mongodb.net/?retryWrites=true&w=majority"
+client = pymongo.MongoClient(mongo_uri)
+db = client.mashypass
 
 # Hello world route to test connection
 @app.route("/")
 def index():
     return "Hello from a Heroku server!"
+
+# Create an example user
+@app.route("/create", methods=["POST"])
+def create_example_user():
+    sample_user = {
+        "email" : "name@example.com",
+        "password" : "password",
+        "registered" : True,
+        "logged_in" : True,
+        "session_id" : "123456790",
+        "session_id_expires" : datetime.datetime.now() + datetime.timedelta(minutes = 30),
+        "vault" : [
+            {
+                "url" : "www.example.com",
+                "username" : "username",
+                "password" : "password"
+            }
+        ]
+    }
+    db.users.insert_one(sample_user)
+    return Response(status=201)
 
 
 # user registration

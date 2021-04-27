@@ -79,7 +79,6 @@ class User:
         self.session_id = session_id
         self.session_expires = datetime.datetime.now() + datetime.timedelta(minutes = 30)
 
-
 # Stand-in local database that we will use until we integrate MySQL
 class DB:
     def __init__(self):
