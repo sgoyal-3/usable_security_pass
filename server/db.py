@@ -83,7 +83,7 @@ class User:
 # Stand-in local database that we will use until we integrate MySQL
 class DB:
     def __init__(self):
-        self.mongo_uri = "mongodb+srv://user-2:550Maranello@learning-cluster.tpidq.mongodb.net/?retryWrites=true&w=majority"
+        self.mongo_uri = "mongodb+srv://user-2:L9B9VUyWb62vgxlS@learning-cluster.tpidq.mongodb.net/?retryWrites=true&w=majority"
         self.client = pymongo.MongoClient(self.mongo_uri).mashypass
     
     def add_user(self, post_body):
