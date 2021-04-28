@@ -165,6 +165,59 @@ def fetch_vault_entry():
     return Response(status=400)
 
 
+# Update an existing record in user's vault
+@app.route("/api/vault", methods=["PUT"])
+@cross_origin(origin='chrome-extension://bebffpohmffmkmbmanhdpepoineaegai', headers=['Content- Type','Authorization'])
+def update_vault_entry():
+    '''
+    Update an existing record in user's vault
+    '''
+    email = request.args.get('email')
+    session_id = request.args.get('session-id')
+    request_body = request.json
+
+    if not email or not session_id:
+        logging.error(err.MISSING_URL_PARAMS)
+        return Response(status=400)
+    if not request_body:
+        logging.error(err.MISSING_REQUEST_BODY)
+        return Response(status=400)
+    
+    try:
+        db.update_vault_entry(email, session_id, request_body)
+        return Response(status=201)
+    except BadRequest as e:
+        return Response(status=400, response=e.message)
+    except KeyNotFound as e:
+        return Response(status=400, response=e.message)
+    return Response(status=400)
+
+
+# Delete a record from the vault
+@app.route("/api/vault", methods=["DELETE"])
+@cross_origin(origin='chrome-extension://bebffpohmffmkmbmanhdpepoineaegai', headers=['Content- Type','Authorization'])
+def delete_vault_entry():
+    '''
+    Delete a vault entry from a user's vault
+    '''
+    email = request.args.get('email')
+    url = request.args.get('url')
+    session_id = request.args.get('session-id')
+    if not email or not url or not session_id:
+        logging.error(err.MISSING_URL_PARAMS)
+        return Response(status=400)
+    try:
+        db.delete_vault_entry(email, url, session_id)
+        return Response(status=201)
+    except BadRequest as e:
+        return Response(status=400, respose=e.message)
+    except KeyNotFound as e:
+        return Response(status=400, response=e.message)
+    
+    return Response(status=400)
+
+
+
 
 
 

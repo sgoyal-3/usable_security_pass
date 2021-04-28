@@ -80,7 +80,7 @@ class User:
         self.session_id = session_id
         self.session_expires = datetime.datetime.now() + datetime.timedelta(minutes = 30)
 
-# Stand-in local database that we will use until we integrate MySQL
+# Represents a connection to MongoDB database
 class DB:
     def __init__(self):
         self.mongo_uri = "mongodb+srv://user-2:L9B9VUyWb62vgxlS@learning-cluster.tpidq.mongodb.net/?retryWrites=true&w=majority"
@@ -135,7 +135,8 @@ class DB:
 
         session_id = session.generate_session_id(user["password"].encode('utf-8'))
         self.client.users.update_one({'_id' : user.get('_id')}, 
-        {'$set' : {'logged_in' : True, 'session_id' : session_id}})
+        {'$set' : {'logged_in' : True, 'session_id' : session_id, 
+        'session_id_expires' : datetime.datetime.now() + datetime.timedelta(minutes=30)}})
         return session_id
     
 
@@ -157,6 +158,9 @@ class DB:
         if not user.get('session_id') == session_id.encode('utf-8'):
             raise BadRequest(message="Invalid session_id")
         
+        if datetime.datetime.now() > user.get('session_id_expires'):
+            raise BadRequest(message=" session_id has expired")
+        
         user_vault = user.get('vault')
         user_vault.append({'url' : url, 'username' : username, 'password' : password})    
         self.client.users.update_one({'_id' : user.get('_id')}, 
@@ -172,14 +176,76 @@ class DB:
             raise KeyNotFound(message=" User with email: {} is not present".format(email))
 
         if not session_id.encode('utf-8') == user.get('session_id'):
-            raise BadRequest(message=" Invalid session_id") 
+            raise BadRequest(message=" Invalid session_id")
+
+        if datetime.datetime.now() > user.get('session_id_expires'):
+            raise BadRequest(message=" session_id has expired") 
 
         user_vault = user.get('vault')
         for vault_entry in user_vault:
             if vault_entry.get('url') == url:
                 return vault_entry
 
-        raise KeyNotFound(message=" Vault with url: {} is not present".format(url))  
+        raise KeyNotFound(message=" Vault with url: {} is not present".format(url))
+
+
+    def update_vault_entry(self, email, session_id, put_body):
+        '''
+        Update an existing entry in the user's vault
+        '''
+        try:
+            url = put_body['url']
+            username = put_body['username']
+            password = put_body['password']
+        except KeyError:
+            raise BadRequest(message="Required attributes are missing")
+
+        user = self.client.users.find_one({'email':email})
+        if user == None:
+            raise KeyNotFound(message=" User with email: {} is not present".format(email))
+
+        if not session_id.encode('utf-8') == user.get('session_id'):
+            raise BadRequest(message=" Invalid session_id")
+
+        if datetime.datetime.now() > user.get('session_id_expires'):
+            raise BadRequest(message=" session_id has expired") 
+
+        user_vault = user.get('vault')
+        for vault_entry in user_vault:
+            if vault_entry.get('url') == url:
+                vault_entry['username'] = username
+                vault_entry['password'] = password
+                self.client.users.update_one({'_id' : user.get('_id')}, 
+                {'$set' : {'vault' : user_vault}})
+                return
+
+        raise KeyNotFound(message=" Vault with url: {} is not present".format(url))
+        
+
+    def delete_vault_entry(self, email, url, session_id):
+        user = self.client.users.find_one({'email':email})
+        if user == None:
+            raise KeyNotFound(message=" User with email: {} is not present".format(email))
+        
+        if not session_id.encode('utf-8') == user.get('session_id'):
+            raise BadRequest(message=" Invalid session_id") 
+        
+        if datetime.datetime.now() > user.get('session_id_expires'):
+            raise BadRequest(message=" session_id has expired")
+        
+        user_vault = user.get('vault')
+        for vault_entry in user_vault:
+            if vault_entry.get('url') == url:
+                user_vault.remove(vault_entry)
+                self.client.users.update_one({'_id' : user.get('_id')}, 
+                {'$set' : {'vault' : user_vault}})
+                return
+        
+        raise KeyNotFound(message=" Vault with url: {} is not present".format(url))
+        
+        
+
+
 
         
 
