@@ -17,9 +17,13 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 cors = CORS(app, resources={r"/api/register" : {"origins" : "chrome-extension://bebffpohmffmkmbmanhdpepoineaegai"}})
 
 # Databse config
+'''
 mongo_uri = "mongodb+srv://user-2:550Maranello@learning-cluster.tpidq.mongodb.net/?retryWrites=true&w=majority"
 client = pymongo.MongoClient(mongo_uri)
 db = client.mashypass
+'''
+
+db = DB()
 
 # Hello world route to test connection
 @app.route("/")

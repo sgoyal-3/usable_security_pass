@@ -1,6 +1,7 @@
 import security.session as session
 import base64
 import datetime
+import pymongo
 
 
 # helper function that converts query result to json, after cursor has executed query
@@ -82,8 +83,8 @@ class User:
 # Stand-in local database that we will use until we integrate MySQL
 class DB:
     def __init__(self):
-        self.users = {} # Holds all user data, indexed by user's email
-        self.user_vaults = {} # Holds all user vault data, indexed by user's email
+        self.mongo_uri = "mongodb+srv://user-2:550Maranello@learning-cluster.tpidq.mongodb.net/?retryWrites=true&w=majority"
+        self.client = pymongo.MongoClient(self.mongo_uri).mashypass
     
     def add_user(self, post_body):
         '''
@@ -95,48 +96,53 @@ class DB:
         except KeyError:
             raise BadRequest(message=" Required attribute is missing.")
         
-        if user_email in self.users:
-            already_present_msg = " User with email: {} is already present".format(user_email)
-            raise BadRequest(message=already_present_msg)
+        if not self.client.users.find_one({'email' : user_email}) == None:
+            raise BadRequest(message=" User with email: {} is already present".format(user_email))
 
-        self.users[user_email] = User(user_email, user_password)
+        self.client.users.insert_one({
+            "email" : user_email,
+            "password" : user_password,
+            "registered" : True,
+            "logged_in" : False,
+            "session_id" : None,
+            "session_id_expires" : None,
+            "vault" : []
+        })
 
     
     def fetch_user_password(self, email):
         '''
         Check if user credentials given in post_body matches records in self.users
         '''
-        if not email in self.users:
+        user = self.client.users.find_one({'email' : email})
+        if user == None:
             raise KeyNotFound(message=" User with email: {} is not present".format(email))
-        
-        password = self.users[email].password
-        return password
+    
+        return user["password"]
     
 
     def login_user(self, email, token):
         '''
         Login the user whose email is equal to email and generate
         a session-id for the user
-        '''
-        if not email in self.users:
-            raise KeyNotFound(message=" User with email: {} is not present".format(email))
-        
+        ''' 
         if not token == "oPB6jRIlzTSqO9J4MgY3":
             raise BadRequest(message=" Invalid token")
 
-        self.users[email].log_in()
-        session_id = session.generate_session_id(self.users[email].password.encode('utf-8'))
-        self.users[email].set_session_id(session_id)
+        user = self.client.users.find_one({'email' : email})
+        if user == None:
+            raise KeyNotFound(message=" User with email: {} is not present".format(email))
+
+        session_id = session.generate_session_id(user["password"].encode('utf-8'))
+        self.client.users.update_one({'_id' : user.get('_id')}, 
+        {'$set' : {'logged_in' : True, 'session_id' : session_id}})
         return session_id
     
 
     def add_vault_entry(self, email, session_id, post_body):
         '''
         Add a new entry to a user's vault
-        '''
-        if not email in self.users:
-            raise KeyNotFound(message=" User with email: {} is not present".format(email))
-        
+        ''' 
         try:
             url = post_body['url']
             username = post_body['username']
@@ -144,31 +150,37 @@ class DB:
         except KeyError:
             raise BadRequest(message="Required attributes are missing")
         
-        user = self.users[email]
-        encoded = session_id.encode('utf-8')
-        if not user.session_id == encoded:
-            raise BadRequest(message="Invalid session_id: received {}, expected {}".format(encoded, user.session_id))
+        user = self.client.users.find_one({'email' : email})
+        if user == None:
+            raise KeyNotFound(message=" User with email: {} is not present".format(email))
+
+        if not user.get('session_id') == session_id.encode('utf-8'):
+            raise BadRequest(message="Invalid session_id")
         
-        
-        self.users[email].vault[url] = VaultEntry(url, username, password)
+        user_vault = user.get('vault')
+        user_vault.append({'url' : url, 'username' : username, 'password' : password})    
+        self.client.users.update_one({'_id' : user.get('_id')}, 
+        {'$set' : {'vault' : user_vault}})
     
 
     def fetch_vault_entry(self, email, url, session_id):
         '''
         Fetch a vault entry from the user's vault
         '''
-        if not email in self.users:
+        user = self.client.users.find_one({'email':email})
+        if user == None:
             raise KeyNotFound(message=" User with email: {} is not present".format(email))
-        user = self.users[email]
 
-        if not url in self.users[email].vault:
-            raise KeyNotFound(message=" Vault with url: {} is not present".format(url))
-        
-        if not session_id.encode('utf-8') == user.session_id:
+        if not session_id.encode('utf-8') == user.get('session_id'):
             raise BadRequest(message=" Invalid session_id") 
 
+        user_vault = user.get('vault')
+        for vault_entry in user_vault:
+            if vault_entry.get('url') == url:
+                return vault_entry
 
-        return self.users[email].vault[url].to_dict()
+        raise KeyNotFound(message=" Vault with url: {} is not present".format(url))  
+
         
 
 
