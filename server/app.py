@@ -217,6 +217,31 @@ def delete_vault_entry():
     return Response(status=400)
 
 
+# Check if user is reusing passwords accross multiple websites
+@app.route("/api/analytics/vault/reuse", methods=["GET"])
+@cross_origin(origin='chrome-extension://bebffpohmffmkmbmanhdpepoineaegai', headers=['Content- Type','Authorization'])
+def get_resuse_statistics():
+    '''
+    Find the number of passwords a user is reusing across all accounts
+    '''
+    email = request.args.get('email')
+    session_id = request.args.get('session-id')
+    if not email or not session_id:
+        logging.error(err.MISSING_URL_PARAMS)
+        return Response(status=400)
+    try:
+        return jsonify(db.get_resuse_statistics(email, session_id))
+    except BadRequest as e:
+        return Response(status=400, response=e.message)
+    except KeyNotFound as e:
+        return Response(status=400, response=e.message)
+        
+    return Response(status=400)
+
+
+
+
+
 
 
 

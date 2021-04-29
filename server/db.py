@@ -42,50 +42,31 @@ class BadRequest(Exception):
         return rv
 
 
-class VaultEntry:
-
-    def __init__(self, url, username, password):
-        self.url = url
-        self.username = username
-        self.password = password
-    
-    def update(self, new_url=None, new_username=None, new_password=None):
-        if new_url is not None:
-            self.url = new_url
-        if new_username is not None:
-            self.username = new_username
-        if new_password is not None:
-            self.password = new_password
-    
-    def to_dict(self):
-        return {"url" : self.url, "username" : self.username, "password" : self.password}
-
-
-# Defines a user entity
-class User:
-
-    def __init__(self, email, password):
-        self.email = email
-        self.password = password
-        self.vault = {}
-        self.registered = True
-        self.logged_in = False
-        self.session_id = None
-        self.session_expires = None
-    
-    def log_in(self):
-        self.logged_in = True
-    
-    def set_session_id(self, session_id):
-        self.session_id = session_id
-        self.session_expires = datetime.datetime.now() + datetime.timedelta(minutes = 30)
-
 # Represents a connection to MongoDB database
 class DB:
     def __init__(self):
         self.mongo_uri = "mongodb+srv://user-2:L9B9VUyWb62vgxlS@learning-cluster.tpidq.mongodb.net/?retryWrites=true&w=majority"
         self.client = pymongo.MongoClient(self.mongo_uri).mashypass
     
+
+    def validate_user_session(self, email, session_id):
+        '''
+        Checks that user is in the database, session_id is valid
+        and has not expired
+        '''
+        user = self.client.users.find_one({'email' : email})
+        if user == None:
+            raise KeyNotFound(message=" User with email: {} is not present".format(email))
+
+        if not user.get('session_id') == session_id.encode('utf-8'):
+            raise BadRequest(message="Invalid session_id")
+        
+        if datetime.datetime.now() > user.get('session_id_expires'):
+            raise BadRequest(message=" session_id has expired")
+        
+        return user
+
+
     def add_user(self, post_body):
         '''
         Add a new email and password to the database
@@ -107,9 +88,8 @@ class DB:
             "session_id" : None,
             "session_id_expires" : None,
             "vault" : []
-        })
+        })    
 
-    
     def fetch_user_password(self, email):
         '''
         Check if user credentials given in post_body matches records in self.users
@@ -151,15 +131,7 @@ class DB:
         except KeyError:
             raise BadRequest(message="Required attributes are missing")
         
-        user = self.client.users.find_one({'email' : email})
-        if user == None:
-            raise KeyNotFound(message=" User with email: {} is not present".format(email))
-
-        if not user.get('session_id') == session_id.encode('utf-8'):
-            raise BadRequest(message="Invalid session_id")
-        
-        if datetime.datetime.now() > user.get('session_id_expires'):
-            raise BadRequest(message=" session_id has expired")
+        user = self.validate_user_session(email, session_id)
         
         user_vault = user.get('vault')
         user_vault.append({'url' : url, 'username' : username, 'password' : password})    
@@ -171,15 +143,7 @@ class DB:
         '''
         Fetch a vault entry from the user's vault
         '''
-        user = self.client.users.find_one({'email':email})
-        if user == None:
-            raise KeyNotFound(message=" User with email: {} is not present".format(email))
-
-        if not session_id.encode('utf-8') == user.get('session_id'):
-            raise BadRequest(message=" Invalid session_id")
-
-        if datetime.datetime.now() > user.get('session_id_expires'):
-            raise BadRequest(message=" session_id has expired") 
+        user = self.validate_user_session(email, session_id)
 
         user_vault = user.get('vault')
         for vault_entry in user_vault:
@@ -200,15 +164,7 @@ class DB:
         except KeyError:
             raise BadRequest(message="Required attributes are missing")
 
-        user = self.client.users.find_one({'email':email})
-        if user == None:
-            raise KeyNotFound(message=" User with email: {} is not present".format(email))
-
-        if not session_id.encode('utf-8') == user.get('session_id'):
-            raise BadRequest(message=" Invalid session_id")
-
-        if datetime.datetime.now() > user.get('session_id_expires'):
-            raise BadRequest(message=" session_id has expired") 
+        user = self.validate_user_session(email, session_id)
 
         user_vault = user.get('vault')
         for vault_entry in user_vault:
@@ -223,15 +179,10 @@ class DB:
         
 
     def delete_vault_entry(self, email, url, session_id):
-        user = self.client.users.find_one({'email':email})
-        if user == None:
-            raise KeyNotFound(message=" User with email: {} is not present".format(email))
-        
-        if not session_id.encode('utf-8') == user.get('session_id'):
-            raise BadRequest(message=" Invalid session_id") 
-        
-        if datetime.datetime.now() > user.get('session_id_expires'):
-            raise BadRequest(message=" session_id has expired")
+        '''
+        Deletes an existing entry from the user's vault
+        '''
+        user = self.validate_user_session(email, session_id)
         
         user_vault = user.get('vault')
         for vault_entry in user_vault:
@@ -242,6 +193,46 @@ class DB:
                 return
         
         raise KeyNotFound(message=" Vault with url: {} is not present".format(url))
+    
+
+    def get_resuse_statistics(self, email, session_id):
+        '''
+        Find the number of passwords user is reusing, the number of websites on 
+        which they are used, and the names of all websites on which they are used
+        '''
+        user = self.validate_user_session(email, session_id)
+
+        user_vault = user.get('vault')
+        password_frequencies = {}
+        for vault_entry in user_vault:
+            pswd = vault_entry.get('password')
+            if pswd not in password_frequencies:
+                password_frequencies[pswd] = (1, [vault_entry.get('url')])
+            else:
+                print(password_frequencies[pswd])
+                (times_used, hostnames) = password_frequencies[pswd]
+                hostnames.append(vault_entry.get('url'))
+                password_frequencies[pswd] = (times_used + 1, hostnames)
+
+        num_reused = 0
+        hostname_list = []
+        for key in password_frequencies:
+            (times_used, hostnames) = password_frequencies[pswd]
+            if times_used > 1:
+                num_reused += 1
+                hostname_list += hostnames
+
+        return {'num_reused' : num_reused, 'num_sites' : len(hostname_list), 
+                'websites' : hostname_list}    
+
+
+
+
+
+
+
+
+
         
         
 

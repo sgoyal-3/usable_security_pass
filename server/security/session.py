@@ -20,9 +20,7 @@ def generate_session_id(password):
     return session_id
 
 
-def generate_secret_key(master_password):
-    '''
-    Generate a user's secret key that we will use to encrypt their vault 
-    '''
-    pass
+
+
+
 
