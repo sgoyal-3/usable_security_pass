@@ -45,9 +45,6 @@ window.addEventListener('load', function() {
             let dbPassword = response.data;
             if (bcrypt.compareSync(password, dbPassword)) {
                 console.log("Access Granted");
-                
-               
-
                 //display login success
                 window.location.replace("/html/login_successful.html");
                 getSessionId(email); // Get our session-id tokens

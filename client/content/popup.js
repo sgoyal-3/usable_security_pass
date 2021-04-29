@@ -1,3 +1,5 @@
+var axios = require('axios');
+
 function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -13,21 +15,22 @@ function getCookie(name) {
 
 // if session saved, redirect to login_succsesful page
 window.addEventListener('load', function() {
+
     if(document.cookie == ""){
         console.log("no cookies set");
-    } else{
+    } else {
+        // If cookies are set, check with server to see if session is expired
         console.log("cookies set");
-
-         //can take these things out later maybe
-
-        //send session id and email to background.js so content.js can access it 
         var email = getCookie("email");
         var session_id = getCookie("session-id");
-        port.postMessage({email: email, session_id: session_id});
-        console.log("Sent email and sesion_id");
-
-
-        window.location.replace("/html/login_successful.html");
+        axios.get(`https://mashypass-app.herokuapp.com/api/session?email=${email}&session-id=${session_id}`)
+        .then(function(response) {
+            port.postMessage({email: email, session_id: session_id});
+            window.location.replace("/html/login_successful.html");
+        })
+        .catch(function(error) {
+            console.log(error.response.data);
+        })
     }
 })
 

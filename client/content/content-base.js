@@ -91,6 +91,7 @@ search for username/password fields
 wait until page js runs and dom fully loaded to do so
  */
 window.addEventListener ("load", search, false);
+window.addEventListener("load", onRegistrationPage, false);
 
 function search(){
 
@@ -155,6 +156,32 @@ function search(){
     
 
 }
+
+
+/*
+* Check to see if we are on a registration page
+*/
+function onRegistrationPage() {
+    
+    let passwordField = document.getElementById("password");
+    let url = window.location.toString();
+    if (typeof(passwordField) !== 'undefined' && passwordField !== null 
+        && !url.includes("login")) {
+           console.log("on registration page") 
+        } else {
+            console.log("not on registration page");
+        }
+}
+
+
+
+
+
+
+
+
+
+
 
 
 //sends credentials and info to background.js
