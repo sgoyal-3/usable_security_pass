@@ -106,9 +106,34 @@ def login_user():
     token = request.args.get('token')
     if not email or not token:
         logging.error(err.MISSING_URL_PARAMS)
+        return Response(status=400, response=err.MISSING_URL_PARAMS)
     try:
         session_id = db.login_user(email, token)
         return Response(response=session_id, status=201)
+    except KeyNotFound as e:
+        logging.error(err.EMAIL_NOT_FOUND)
+        return Response(response=e.message, status=400)
+    except BadRequest as e:
+        logging.error(e.message)
+        return Response(response=e.message, status=400)
+    
+    return Response(status=400)
+
+
+# Route that checks if user is still logged in
+@app.route("/api/session", methods=["GET"])
+@cross_origin(origin='chrome-extension://bebffpohmffmkmbmanhdpepoineaegai', headers=['Content- Type','Authorization'])
+def validate_user_session():
+    '''
+    Check if user is still logged in
+    '''
+    email = request.args.get('email')
+    session_id = request.args.get('session-id')
+    if not email or not session_id:
+        return Response(status=400, response=err.MISSING_URL_PARAMS)
+    try:
+        db.validate_user_session(email, session_id)
+        return Response(status=201)
     except KeyNotFound as e:
         logging.error(err.EMAIL_NOT_FOUND)
         return Response(response=e.message, status=400)

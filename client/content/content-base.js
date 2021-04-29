@@ -61,16 +61,25 @@ const event = new Event('build');
 // Listen for the event.
 window.addEventListener('build', function (e) { 
         console.log('hi');
+        /*
        let url = document.location;
         console.log(session_id);
         console.log(email);
+        console.log(url);
+        */
+        let testEmail = "rookiemail@comcast.net";
+        let url = "www.example2.com";
+        let sessionId = "123456789"
+
         console.log("sending axios now");
-        axios.get(`https://mashypass-app.herokuapp.com/api/vault?session-id=${session_id}&email=${email}&url=${url}`, {})
+        axios.get(`https://mashypass-app.herokuapp.com/api/vault?session-id=${sessionId}&email=${testEmail}&url=${url}`, {})
         .then(function (response) {
             console.log(response);
         })
         .catch(function (error) {
-            console.log(error);
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
         })
         
 

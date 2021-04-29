@@ -11,8 +11,6 @@ function getCookie(name) {
       name: "Sample Communication"
  });
 
-
-
 // if session saved, redirect to login_succsesful page
 window.addEventListener('load', function() {
     if(document.cookie == ""){
@@ -32,13 +30,6 @@ window.addEventListener('load', function() {
         window.location.replace("/html/login_successful.html");
     }
 })
-
-
-
-
-
-
-
 
 
 /*
