@@ -26747,8 +26747,14 @@ window.addEventListener('build', function (e) {
 search for username/password fields
 wait until page js runs and dom fully loaded to do so
  */
-window.addEventListener ("load", search, false);
-window.addEventListener("load", onRegistrationPage, false);
+//window.addEventListener ("load", () => {displayModal("username", "password")}, false);
+window.addEventListener("load", () => {
+    if (onRegistrationPage()){
+        console.log("On a registration page")
+        displayPasswordGenButton();
+    }
+
+});
 
 function search(){
 
@@ -26822,23 +26828,19 @@ function onRegistrationPage() {
     
     let passwordField = document.getElementById("password");
     let url = window.location.toString();
-    if (typeof(passwordField) !== 'undefined' && passwordField !== null 
-        && !url.includes("login")) {
-           console.log("on registration page") 
-        } else {
-            console.log("not on registration page");
-        }
+    return (typeof(passwordField) !== 'undefined' && passwordField !== null 
+    && !url.includes("login"));
 }
 
 
-
-
-
-
-
-
-
-
+function displayPasswordGenButton() {
+    console.log("displaying button in password input field");
+    let passwordInput = document.getElementById("password");
+    passwordInput.style.backgroundImage = null;
+    fetch(chrome.runtime.getURL('/html/password_gen.html')).then(r => r.text()).then(html => {
+        passwordInput.parentElement.insertAdjacentHTML('beforeend', html);
+    })
+}
 
 
 //sends credentials and info to background.js
