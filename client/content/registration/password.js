@@ -138,6 +138,28 @@ function givePasswordFeedback(password) {
 
 }
 
+
+/*
+* genSecurePassword: Generate a secure password from scratch
+*/
+function genSecurePassword(){
+    var result = [];
+    var characters= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvxyz1234567890!@#$%^&*()";
+    var charactersLength = characters.length;
+    for ( var i = 0; i < 20; i++ ) {
+        result.push(characters.charAt(Math.floor(Math.random() * 
+            charactersLength)));
+     }
+     return result.join('');
+}
+
+
+
+
+
+
+
+
 window.addEventListener('load', () => {
     let password = document.getElementById("password");
     password.addEventListener('input', () => {
@@ -147,4 +169,5 @@ window.addEventListener('load', () => {
 })
 
 module.exports.givePasswordFeedback = givePasswordFeedback;
-module.exports.createPasswordSuggestion = createPasswordSuggestion; 
+module.exports.createPasswordSuggestion = createPasswordSuggestion;
+module.exports.genSecurePassword = genSecurePassword; 

@@ -9,7 +9,8 @@ whose URL fits the matches clause specified in manifest.json
 
 
 var CryptoJS = require("crypto-js");
-var axios = require('axios')
+var axios = require('axios');
+var passwordModule = require('../content/registration/password.js');
 
 
 function getCookieValue(name) {
@@ -182,6 +183,13 @@ function displayPasswordGenButton() {
     passwordInput.style.backgroundImage = null;
     fetch(chrome.runtime.getURL('/html/password_gen.html')).then(r => r.text()).then(html => {
         passwordInput.parentElement.insertAdjacentHTML('beforeend', html);
+    })
+    .then(() => {
+        document.getElementById("lock-icon-container").addEventListener("click", () => {
+            let securePassword = passwordModule.genSecurePassword();
+            console.log(securePassword);
+            passwordInput.value = securePassword;
+        })
     })
 }
 
