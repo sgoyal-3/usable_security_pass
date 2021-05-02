@@ -26840,21 +26840,82 @@ function displayPasswordGenButton() {
     })
     .then(() => {
         document.getElementById("lock-icon-container").addEventListener("click", () => {
-            document.getElementById("dialog-box").style.display = "flex";
 
-            document.getElementById("lock-icon-container").addEventListener('click', () => {
-                document.getElementById("dialog-box").style.display = "none";
-            })
+            let dialogBox = document.getElementById("dialog-box");
+            if (dialogBox.value === "ON") {
+                dialogBox.value = "OFF";
+                dialogBox.style.display = "none"; 
+            } else {
+                dialogBox.value = "ON";
+                dialogBox.style.display = "flex";
+            }
 
             passwordInput.addEventListener('input', () => {
-                let strengthObject = passwordModule.givePasswordFeedback(passwordInput.value);
-                document.getElementById("crack-time").innerText = "Time to crack: " + strengthObject.crackTime;
-                document.getElementById("suggestions").innerText = strengthObject.suggestions;
-                document.getElementById("strength-meter").value = strengthObject.score;
-            })    
+                fillInPasswordFeedback(passwordInput);
+
+            })
+            
+            let showPassword = document.getElementById("show-password");
+            showPassword.addEventListener('click', (e) => {
+                e.preventDefault();
+                let currentPassword = document.getElementById("current-password");
+                if (showPassword.value === "ON") {
+                    showPassword.value = "OFF";
+                    showPassword.innerHTML = "Show Current Password";
+                    currentPassword.style.display = "none";
+                } else {
+                    showPassword.value = "ON";
+                    showPassword.innerHTML = "Hide Current Password";
+                    currentPassword.style.display = "flex";
+                }
+            })
+
+            document.getElementById("auto-generate").addEventListener("click", (e) => {
+                e.preventDefault();
+                passwordInput.value = passwordModule.genSecurePassword();
+                fillInPasswordFeedback(passwordInput);
+            })
+
+            document.getElementById("mashify").addEventListener("click", (e) => {
+                e.preventDefault();
+                passwordInput.value = passwordModule.createPasswordSuggestion(passwordInput);
+                fillInPasswordFeedback(passwordInput);
+            })
+
         })
     })
 }
+
+function fillInPasswordFeedback(passwordInput) {
+    let strengthObject = passwordModule.givePasswordFeedback(passwordInput.value);
+    document.getElementById("crack-time").innerText = "Time to crack: " + strengthObject.crackTime;
+    document.getElementById("suggestions").innerText = strengthObject.suggestions;
+    let strengthMeter = document.getElementById("strength-meter");
+    if (strengthObject.score == 0) {
+        strengthMeter.style.width = "20%";
+        strengthMeter.style.background = "red";
+    } else if (strengthObject.score == 1) {
+        strengthMeter.style.width = "40%";
+        strengthMeter.style.background = "orange";
+    } else if (strengthObject.score == 2) {
+        strengthMeter.style.width = "60%";
+        strengthMeter.style.background = "yellow";
+    } else if (strengthObject.score == 3) {
+        strengthMeter.style.width = "80%";
+        strengthMeter.style.bacgkround = "#90ee90";
+    } else if (strengthObject.score = 4) {
+        strengthMeter.style.width = "100%";
+        strengthMeter.style.background = "green";
+    } else {
+        strengthMeter.style.width = "100%";
+        strengthMeter.style.background = "black";
+    }
+
+    document.getElementById("current-password").innerHTML = "Current password: " + passwordInput.value;
+}
+
+
+
 
 
 //sends credentials and info to background.js
