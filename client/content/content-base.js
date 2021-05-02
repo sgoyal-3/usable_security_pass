@@ -10,7 +10,7 @@ whose URL fits the matches clause specified in manifest.json
 
 var CryptoJS = require("crypto-js");
 var axios = require('axios');
-var passwordModule = require('../content/registration/password.js');
+var passwordModule = require('./registration/password.js');
 
 
 function getCookieValue(name) {
@@ -22,10 +22,7 @@ function getCookieValue(name) {
 var email = "";
 var session_id = "";
 
-
 const event = new Event('build');
-
-
 
 //establish communication connection with background.js
  var port = chrome.extension.connect({
@@ -186,9 +183,18 @@ function displayPasswordGenButton() {
     })
     .then(() => {
         document.getElementById("lock-icon-container").addEventListener("click", () => {
-            let securePassword = passwordModule.genSecurePassword();
-            console.log(securePassword);
-            passwordInput.value = securePassword;
+            document.getElementById("dialog-box").style.display = "flex";
+
+            document.getElementById("lock-icon-container").addEventListener('click', () => {
+                document.getElementById("dialog-box").style.display = "none";
+            })
+
+            passwordInput.addEventListener('input', () => {
+                let strengthObject = passwordModule.givePasswordFeedback(passwordInput.value);
+                document.getElementById("crack-time").innerText = "Time to crack: " + strengthObject.crackTime;
+                document.getElementById("suggestions").innerText = strengthObject.suggestions;
+                document.getElementById("strength-meter").value = strengthObject.score;
+            })    
         })
     })
 }

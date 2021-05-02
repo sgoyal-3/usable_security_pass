@@ -26667,7 +26667,7 @@ whose URL fits the matches clause specified in manifest.json
 
 var CryptoJS = require("crypto-js");
 var axios = require('axios');
-var passwordModule = require('../content/registration/password.js');
+var passwordModule = require('./registration/password.js');
 
 
 function getCookieValue(name) {
@@ -26679,10 +26679,7 @@ function getCookieValue(name) {
 var email = "";
 var session_id = "";
 
-
 const event = new Event('build');
-
-
 
 //establish communication connection with background.js
  var port = chrome.extension.connect({
@@ -26843,9 +26840,18 @@ function displayPasswordGenButton() {
     })
     .then(() => {
         document.getElementById("lock-icon-container").addEventListener("click", () => {
-            let securePassword = passwordModule.genSecurePassword();
-            console.log(securePassword);
-            passwordInput.value = securePassword;
+            document.getElementById("dialog-box").style.display = "flex";
+
+            document.getElementById("lock-icon-container").addEventListener('click', () => {
+                document.getElementById("dialog-box").style.display = "none";
+            })
+
+            passwordInput.addEventListener('input', () => {
+                let strengthObject = passwordModule.givePasswordFeedback(passwordInput.value);
+                document.getElementById("crack-time").innerText = "Time to crack: " + strengthObject.crackTime;
+                document.getElementById("suggestions").innerText = strengthObject.suggestions;
+                document.getElementById("strength-meter").value = strengthObject.score;
+            })    
         })
     })
 }
@@ -26908,7 +26914,7 @@ request registration point if current page is registration_successul.html
 
 
 
-},{"../content/registration/password.js":188,"axios":189,"crypto-js":224}],188:[function(require,module,exports){
+},{"./registration/password.js":188,"axios":189,"crypto-js":224}],188:[function(require,module,exports){
 var zxcvbn = require('zxcvbn');
 
 /*
@@ -27016,13 +27022,14 @@ function createPasswordSuggestion(password) {
 * givePasswordFeedback: Gives a user feedback on their entered password
 */
 function givePasswordFeedback(password) {
-    let passwordValue = password.value;
+    let passwordValue = password;
+    console.log(passwordValue);
     let zxcvbnResult = zxcvbn(passwordValue);
     let score = zxcvbnResult.score;
     let crackTimeDisplay = zxcvbnResult.crack_times_display.offline_fast_hashing_1e10_per_second;
-    let warning = zxcvbnResult.feedback.warning;
     let suggestions = zxcvbnResult.feedback.suggestions;
     
+    /*
     document.getElementById('password-display').innerHTML = `Current password: ${passwordValue}`;
 
     let scoreElement = document.getElementById('score');
@@ -27035,6 +27042,8 @@ function givePasswordFeedback(password) {
     warningElement.innerHTML = `Warnings: ${warning}`
 
     let suggestionsElement = document.getElementById('suggestions');
+    */
+
     let suggestionString = "Suggestions: ";
 
     if (score < 4 && suggestions.length == 0) {
@@ -27045,7 +27054,11 @@ function givePasswordFeedback(password) {
         }
     }
 
-    suggestionsElement.innerHTML = suggestionString;
+    return {
+        "score" : score,
+        "crackTime" : `${crackTimeDisplay}`,
+        "suggestions" : `${suggestionString}`
+    }
 
 }
 
@@ -27064,20 +27077,6 @@ function genSecurePassword(){
      return result.join('');
 }
 
-
-
-
-
-
-
-
-window.addEventListener('load', () => {
-    let password = document.getElementById("password");
-    password.addEventListener('input', () => {
-        givePasswordFeedback(password);
-    });
-
-})
 
 module.exports.givePasswordFeedback = givePasswordFeedback;
 module.exports.createPasswordSuggestion = createPasswordSuggestion;

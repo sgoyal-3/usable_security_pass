@@ -105,13 +105,14 @@ function createPasswordSuggestion(password) {
 * givePasswordFeedback: Gives a user feedback on their entered password
 */
 function givePasswordFeedback(password) {
-    let passwordValue = password.value;
+    let passwordValue = password;
+    console.log(passwordValue);
     let zxcvbnResult = zxcvbn(passwordValue);
     let score = zxcvbnResult.score;
     let crackTimeDisplay = zxcvbnResult.crack_times_display.offline_fast_hashing_1e10_per_second;
-    let warning = zxcvbnResult.feedback.warning;
     let suggestions = zxcvbnResult.feedback.suggestions;
     
+    /*
     document.getElementById('password-display').innerHTML = `Current password: ${passwordValue}`;
 
     let scoreElement = document.getElementById('score');
@@ -124,6 +125,8 @@ function givePasswordFeedback(password) {
     warningElement.innerHTML = `Warnings: ${warning}`
 
     let suggestionsElement = document.getElementById('suggestions');
+    */
+
     let suggestionString = "Suggestions: ";
 
     if (score < 4 && suggestions.length == 0) {
@@ -134,7 +137,11 @@ function givePasswordFeedback(password) {
         }
     }
 
-    suggestionsElement.innerHTML = suggestionString;
+    return {
+        "score" : score,
+        "crackTime" : `${crackTimeDisplay}`,
+        "suggestions" : `${suggestionString}`
+    }
 
 }
 
@@ -153,20 +160,6 @@ function genSecurePassword(){
      return result.join('');
 }
 
-
-
-
-
-
-
-
-window.addEventListener('load', () => {
-    let password = document.getElementById("password");
-    password.addEventListener('input', () => {
-        givePasswordFeedback(password);
-    });
-
-})
 
 module.exports.givePasswordFeedback = givePasswordFeedback;
 module.exports.createPasswordSuggestion = createPasswordSuggestion;
