@@ -90,12 +90,46 @@ wait until page js runs and dom fully loaded to do so
  */
 //window.addEventListener ("load", () => {displayModal("username", "password")}, false);
 window.addEventListener("load", () => {
+    getUserSession();
+
     if (onRegistrationPage()){
         console.log("On a registration page")
         displayPasswordGenButton();
     }
 
 });
+
+
+/*
+* getUserSession: check if user has correct session-id: If not, query the backend
+* for a new session-id
+*/
+function getUserSession() {
+    if (document.cookie === "") {
+        console.log("No cookies, exiting function");
+    } else if (getCookieValue("email") === undefined || getCookieValue("session-id") === undefined) {
+        console.log("No cookies for email and session-id, exiting function");
+        document.cookie = 'email=rookiemail@comcast.net; path=/';
+        document.cookie = 'session-id=1234567890; path=/';
+    } else {
+        let userEmail = getCookieValue("email");
+        let sessionId = getCookieValue("session-id");
+
+        axios.get(`https://mashypass-app.herokuapp.com/api/session?email=${userEmail}&session-id=${sessionId}`)
+        .then(function(response) {
+            console.log(response);
+        })
+        .catch(function(error) {
+            console.log(error.response.data);
+        })
+    }
+}
+
+
+
+
+
+
 
 function search(){
 
@@ -174,8 +208,11 @@ function onRegistrationPage() {
 }
 
 
+/*
+* displayPaswordGenButton: Display button that, when clicked, will 
+* open a dialog box that allows a user to generate a secure password
+*/
 function displayPasswordGenButton() {
-    console.log("displaying button in password input field");
     let passwordInput = document.getElementById("password");
     passwordInput.style.backgroundImage = null;
     fetch(chrome.runtime.getURL('/html/password_gen.html')).then(r => r.text()).then(html => {
@@ -195,7 +232,6 @@ function displayPasswordGenButton() {
 
             passwordInput.addEventListener('input', () => {
                 fillInPasswordFeedback(passwordInput);
-
             })
             
             let showPassword = document.getElementById("show-password");
@@ -229,6 +265,11 @@ function displayPasswordGenButton() {
     })
 }
 
+
+/*
+* fillInPasswordFeedback: Appropriately style the password feedback dialog 
+* box in response to the value of the password input field
+*/
 function fillInPasswordFeedback(passwordInput) {
     let strengthObject = passwordModule.givePasswordFeedback(passwordInput.value);
     document.getElementById("crack-time").innerText = "Time to crack: " + strengthObject.crackTime;
@@ -258,9 +299,6 @@ function fillInPasswordFeedback(passwordInput) {
 }
 
 
-
-
-
 //sends credentials and info to background.js
 function sendCreds(username, password, url){
     console.log("hi im sendCreds");
@@ -269,7 +307,6 @@ function sendCreds(username, password, url){
     console.log(url);
     port.postMessage({username : username, password : password, url : url});
 }
-
 
 
 /*
@@ -312,6 +349,46 @@ request registration point if current page is registration_successul.html
 // if(window.location.pathname+window.location.search == "html/registration_successul.html"){
 //     port.postMessage("Registration point request");
 // }
+
+
+/*
+* getReuseStatistics: Get user's password reuse statistics from backend
+*/
+function getReuseStatistics(userEmail, sessionId) {
+    axios.get(`https://mashypass-app.herokuapp.com/api/analytics/vault/reuse?email=${userEmail}&session-id=${sessionId}`)
+    .then(function(response) {
+        console.log(response);
+        displayReuseStatistics(response.data);
+    })
+    .catch(function(error) {
+        console.log(error.response.data);
+    })
+}
+
+
+/*
+* displayReuseStatistics: Display user's password reuse statistics
+* in a dialog box
+*/
+function displayReuseStatistics(reuseStatistics) {
+    let numPasswords = reuseStatistics.num_reused;
+    let numSites = reuseStatistics.num_sites;
+    document.getElementById("reuse-info").innerHTML = 
+                `You are currently reusing ${numPasswords} passwords across ${numSites} sites. We highly 
+                recommend that you change these passwords in order to protect all 
+                of your accounts `;
+
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
