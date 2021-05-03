@@ -24,5 +24,5 @@
     },
     "web_accessible_resources":["content/script.mjs", "html/popup.html", 
       "html/modal.html", "html/password_gen.html", "content/popup.js", "content/register.js", "static/login.js",
-    "assets/white-lock-icon-2.png"]
+    "assets/white-lock-icon-2.png", "html/login_modal.html", "html/password_reuse.html"]
   }
