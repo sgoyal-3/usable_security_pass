@@ -7,8 +7,7 @@ function getCookieValue(name) {
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(';').shift();
 }
-
-
+/*
 window.addEventListener('load', () => {
     let addToVaultButton = document.getElementById("add");
     addToVaultButton.addEventListener('click', (e) => {
@@ -37,3 +36,22 @@ window.addEventListener('load', () => {
         
     })
 })
+*/
+
+
+function encrypt(msgString, key) {
+    // msgString is expected to be Utf8 encoded
+    var iv = CryptoJS.lib.WordArray.random(16);
+    var encrypted = CryptoJS.AES.encrypt(msgString, key, {
+        iv: iv
+    });
+    return iv.concat(encrypted.ciphertext).toString(CryptoJS.enc.Base64);
+}
+
+
+
+var key = CryptoJS.enc.Utf8.parse('1234567890123456');
+console.log(encrypt('password', key));
+
+
+
