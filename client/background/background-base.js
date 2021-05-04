@@ -17,11 +17,15 @@ function doInCurrentTab(tabCallback) {
 * to the user
 */
 function displayReuseNotif(reuseStatistics) {
+  let numReused = `${reuseStatistics.num_reused}`;
+  let numSites = `${reuseStatistics.num_sites}`;
+
+
   var notifOptions = {
     type: "basic",
     title: "Security Alert",
-    message: `MashyPass has detected password reuse across several accounts. Please
-consider changing your passwords`,
+    message: `MashyPass has detected ${numReused} reused password(s) across ${numSites} accounts. 
+We highly recommend that you change these passwords.`,
     iconUrl: "assets/secure.png",
     silent: true,
     buttons: [
@@ -38,6 +42,7 @@ consider changing your passwords`,
     console.log('notification should be launched now');
 
     chrome.notifications.onButtonClicked.addListener((notifId, buttonIdx) => {
+      console.log(notifId);
       if (buttonIdx == 0) {
         console.log('left button was clicked');
       } else if (buttonIdx == 1) {
@@ -47,15 +52,13 @@ consider changing your passwords`,
       }
     });
 
-    chrome.notifications.onClicked.addEventListener(() => {
+    chrome.notifications.onClicked.addListener(() => {
       chrome.notifications.clear('password-reuse-notif', () => {
         console.log('notification has been cleared');
       });
     })
   })
 }
-
-displayReuseNotif();
 
 
 
@@ -173,9 +176,11 @@ function url_domain(data) {
       }
 
       port.onMessage.addListener(function(msg) {
-           console.log("message recieved: " + msg);
-           console.log(msg.email);
-           console.log(msg.session_id);
+          console.log(msg);
+
+          if (msg.type === 'show-reuse-alert') {
+            displayReuseNotif(msg.data);
+          }
 
            if (typeof(msg.username) != 'undefined'){
               /* 

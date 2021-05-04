@@ -13,14 +13,17 @@ window.addEventListener('load', () => {
     let addToVaultButton = document.getElementById("add");
     addToVaultButton.addEventListener('click', (e) => {
         e.preventDefault();
-        let url = document.location;
+        console.log("hello I am here!!");
+        let url = document.window.location.hostname;
         let username = document.getElementById("modal-email").value;
         let password = document.getElementById("modal-password").value;
         var encrypted = CryptoJS.AES.encrypt(password, 'literally any key').toString();
 
-        let email = getCookieValue('email');
-        let sessionId = getCookieValue('session-id');
-        axios.post(`http://localhost:5000/api/vault?session-id=${sessionId}&email=${email}`, {
+        // let email = getCookieValue('email');
+        // let sessionId = getCookieValue('session-id');
+        let email = 'rookiemail@comcast.net';
+        let sessionId = 'MOdMbeM-spt4OwqAevqwowsbdmNqy_grq9RvMhOwYxg=';
+        axios.post(`https://mashypass-app.herokuapp.com/api/vault?-id=${sessionId}&email=${email}`, {
             'url': `${url}`,
             'username' : `${username}`,
             'password' : `${encrypted}`
