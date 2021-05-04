@@ -217,7 +217,7 @@ class DB:
         num_reused = 0
         hostname_list = []
         for key in password_frequencies:
-            (times_used, hostnames) = password_frequencies[pswd]
+            (times_used, hostnames) = password_frequencies[key]
             if times_used > 1:
                 num_reused += 1
                 hostname_list += hostnames
