@@ -1,6 +1,6 @@
 {
     "manifest_version": 2,
-    "name": "Test Extension",
+    "name": "MASHYPass",
     "version": "1.0.0",
     "content_scripts": [{
       "matches": ["*://*.stackoverflow.com/*"],
@@ -11,7 +11,8 @@
       "chrome-extension://aofelgdcnljcjeejddhcknappobidfch/html/popup.html"
     ],
     "browser_action": {
-      "default_popup" : "html/popup.html"
+      "default_popup" : "html/popup.html",
+      "default_icon" : "assets/secure.png"
     },
     "background" : {
       "scripts": ["background/background.js"],
@@ -24,5 +25,5 @@
     },
     "web_accessible_resources":["content/script.mjs", "html/popup.html", 
       "html/modal.html", "html/password_gen.html", "content/popup.js", "content/register.js", "static/login.js",
-    "assets/white-lock-icon-2.png", "html/login_modal.html", "html/password_reuse.html"]
+    "assets/secure.png", "html/login_modal.html", "html/password_reuse.html"]
   }
