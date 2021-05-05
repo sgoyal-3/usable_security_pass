@@ -1,4 +1,5 @@
 import security.session as session
+import security.crypto as crypto
 import base64
 import datetime
 import pymongo
@@ -205,7 +206,7 @@ class DB:
         user_vault = user.get('vault')
         password_frequencies = {}
         for vault_entry in user_vault:
-            pswd = vault_entry.get('password')
+            pswd = crypto.unpad(crypto.decrypt(vault_entry.get('password'), b"1234567890123456"))
             if pswd not in password_frequencies:
                 password_frequencies[pswd] = (1, [vault_entry.get('url')])
             else:

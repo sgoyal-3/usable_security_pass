@@ -51,7 +51,29 @@ function encrypt(msgString, key) {
 
 
 var key = CryptoJS.enc.Utf8.parse('1234567890123456');
-console.log(encrypt('password', key));
+var userEmail = 'rookiemail2@comcast.net';
+var sessionId = 'e5rwES2J6Nlj1_D4pv5mLibhFWL2E5xjXptINv8QFpw=';
+axios.post(`http://localhost:5000/api/vault?email=${userEmail}&session-id=${sessionId}`, {
+    "url": "www.example.com",
+    "username": "username",
+    "password": `${encrypt('password', key)}` 
+})
+.then(function(response) {
+    axios.post(`http://localhost:5000/api/vault?email=${userEmail}&session-id=${sessionId}`, {
+        "url": "www.example1.com",
+        "username": "username",
+        "password": `${encrypt('password', key)}` 
+    })
+    .then(function(resp) {
+        console.log(resp);
+    })
+    .catch(function(error) {
+        console.log(error.response.data);
+    })
+})
+.catch(function(error) {
+    console.log(error.response.data);
+})
 
 
 
