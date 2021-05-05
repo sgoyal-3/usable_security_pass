@@ -190,6 +190,27 @@ def fetch_vault_entry():
     return Response(status=400)
 
 
+# Retrieve a user's entire vault
+@app.route("/api/vault/all", methods=["GET"])
+@cross_origin(origin='chrome-extension://bebffpohmffmkmbmanhdpepoineaegai', headers=['Content- Type','Authorization'])
+def fetch_vault():
+    '''
+    Fetch a user's entire vault 
+    '''
+    email = request.args.get('email')
+    session_id = request.args.get('session-id')
+    if not email or not session_id:
+        logging.error(err.MISSING_URL_PARAMS)
+        return Response(status=400)
+    try: 
+        return jsonify(db.fetch_vault(email, session_id))
+    except BadRequest as e:
+        return Response(response=e.message, status=400)
+    except KeyNotFound as e:
+        return Response(response=e.message, status=400)
+    return Response(status=400)
+
+
 # Update an existing record in user's vault
 @app.route("/api/vault", methods=["PUT"])
 @cross_origin(origin='chrome-extension://bebffpohmffmkmbmanhdpepoineaegai', headers=['Content- Type','Authorization'])

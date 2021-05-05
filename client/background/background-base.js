@@ -39,7 +39,9 @@ We highly recommend that you change these passwords.`,
   }
 
   chrome.notifications.create("password-reuse-notif", notifOptions, () => {
-    console.log('notification should be launched now');
+    console.log('launching reuse notification...');
+    
+    setTimeout(() => displayReuseNotif(reuseStatistics), 2.16e7); // Notify user every six hours
 
     chrome.notifications.onButtonClicked.addListener((notifId, buttonIdx) => {
       console.log(notifId);
@@ -51,14 +53,18 @@ We highly recommend that you change these passwords.`,
         console.log("this doesn't work I guess");
       }
     });
-
-    chrome.notifications.onClicked.addListener(() => {
-      chrome.notifications.clear('password-reuse-notif', () => {
-        console.log('notification has been cleared');
-      });
-    })
   })
 }
+
+displayReuseNotif({
+  num_reused: 1,
+  num_sites: 3,
+  websites: [
+    "www.example.com",
+    "www.example1.com",
+    "www.example2.com"
+  ]
+})
 
 
 

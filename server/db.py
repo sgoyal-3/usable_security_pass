@@ -152,6 +152,14 @@ class DB:
                 return vault_entry
 
         raise KeyNotFound(message=" Vault with url: {} is not present".format(url))
+    
+
+    def fetch_vault(self, email, session_id):
+        '''
+        Fetch a user's entire vault
+        '''
+        user = self.validate_user_session(email, session_id)
+        return user.get('vault')
 
 
     def update_vault_entry(self, email, session_id, put_body):

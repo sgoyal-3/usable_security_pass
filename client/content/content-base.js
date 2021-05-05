@@ -138,17 +138,31 @@ function getUserSession() {
     }
 }
 
+/*
+* encrypt: Utility function to encrypt user passwords before
+* sending them to the backend
+*/
+function encrypt(msgString, key) {
+    // msgString is expected to be Utf8 encoded
+    var iv = CryptoJS.lib.WordArray.random(16);
+    var encrypted = CryptoJS.AES.encrypt(msgString, key, {
+        iv: iv
+    });
+    return iv.concat(encrypted.ciphertext).toString(CryptoJS.enc.Base64);
+}
+
 
 /*
 * sendVaultCredentials: Send a user's vault credentials to the server
 */
 function sendVaultCredentials(username, password) {
     let url = window.location.hostname + '1';
-    var encrypted = CryptoJS.AES.encrypt(password, 'literally any key').toString();
+    var key = CryptoJS.enc.Utf8.parse('1234567890123456');
+    var encrypted = encrypt(password, key);
      // let email = getCookieValue('email');
     // let sessionId = getCookieValue('session-id');
-    let userEmail = 'rookiemail@comcast.net';
-    let sessionId = 'OA7EiZqlCR1tEXHHAqk3E_wfr31gz2906u42grqaoZw=';
+    let userEmail = 'rookiemail2@comcast.net';
+    let sessionId = 'CA_V5BLVMRh9QUonKGNZS_OzBkgGou8koi20NvBCxsA=';
     axios.post(`https://mashypass-app.herokuapp.com/api/vault?session-id=${sessionId}&email=${userEmail}`, {
         'url': `${url}`,
         'username' : `${username}`,
