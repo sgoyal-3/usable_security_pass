@@ -16,6 +16,7 @@ MarkupSafe==1.1.1
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.20
+pycrypto==2.6.1
 pymongo==3.11.3
 pyOpenSSL==20.0.1
 requests==2.25.1

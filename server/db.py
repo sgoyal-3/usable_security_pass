@@ -206,7 +206,7 @@ class DB:
         user_vault = user.get('vault')
         password_frequencies = {}
         for vault_entry in user_vault:
-            pswd = crypto.unpad(crypto.decrypt(vault_entry.get('password'), b"1234567890123456"))
+            pswd = crypto.decrypt(vault_entry.get('password'), b"1234567890123456")
             if pswd not in password_frequencies:
                 password_frequencies[pswd] = (1, [vault_entry.get('url')])
             else:
