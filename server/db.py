@@ -91,6 +91,7 @@ class DB:
             "vault" : []
         })    
 
+
     def fetch_user_password(self, email):
         '''
         Check if user credentials given in post_body matches records in self.users

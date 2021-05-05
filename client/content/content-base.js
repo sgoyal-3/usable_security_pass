@@ -52,6 +52,13 @@ const event = new Event('build');
       //   console.log("got registration point and it is: ");
       //   console.log(msg.registration_point);
       // }
+
+      if (msg.type === "show-vault"){
+          console.log("Received message to open vault");
+      }
+
+
+
  });
 
 

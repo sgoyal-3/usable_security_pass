@@ -234,6 +234,9 @@ We highly recommend that you change these passwords.`,
       console.log(notifId);
       if (buttonIdx == 0) {
         console.log('left button was clicked');
+        chrome.tabs.create({
+          url: "chrome-extension://aofelgdcnljcjeejddhcknappobidfch/html/vault.html"
+        })
       } else if (buttonIdx == 1) {
         console.log('right button was clicked');
       } else {

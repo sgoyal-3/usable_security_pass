@@ -35,11 +35,11 @@ window.addEventListener('load', function() {
 					//this code taken from login.js - go through login process automatically
 					//upon registration
 					let token = "oPB6jRIlzTSqO9J4MgY3";
-	                axios.put(`https://mashypass-app.herokuapp.com/api/login?email=${email}&token=${token}`)
+	                axios.put(`http://localhost:5000/api/login?email=${email.value}&token=${token}`)
 	                .then(function(resp) {
 	                    console.log(resp);
 	                    document.cookie = `session-id=${resp.data}; path=/`;
-	                    document.cookie = `email=${email}; path=/`;
+	                    document.cookie = `email=${email.value}; path=/`;
 	                    console.log(document.cookie);
 	                })
 	                .catch(function(error) {
@@ -47,7 +47,7 @@ window.addEventListener('load', function() {
 	                })
 
 
-					window.location.replace("/html/registration_successful.html");
+					//window.location.replace("/html/registration_successful.html");
 				}
 			})
 			.catch(function(error) {

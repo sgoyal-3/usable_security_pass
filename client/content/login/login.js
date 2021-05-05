@@ -29,7 +29,6 @@ function getSessionId(email){
 }
 
 
-
 window.addEventListener('load', function() {
     let login = document.getElementById("login");
     login.addEventListener('click', function(e) {
