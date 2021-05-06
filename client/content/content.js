@@ -26709,6 +26709,13 @@ const event = new Event('build');
       //   console.log("got registration point and it is: ");
       //   console.log(msg.registration_point);
       // }
+
+      if (msg.type === "show-vault"){
+          console.log("Received message to open vault");
+      }
+
+
+
  });
 
 
@@ -26813,7 +26820,7 @@ function encrypt(msgString, key) {
 * sendVaultCredentials: Send a user's vault credentials to the server
 */
 function sendVaultCredentials(username, password) {
-    let url = window.location.hostname + '1';
+    let url = window.location.hostname;
     var key = CryptoJS.enc.Utf8.parse('1234567890123456');
     var encrypted = encrypt(password, key);
      // let email = getCookieValue('email');
