@@ -70,6 +70,25 @@ def register_user():
     return Response(status=201)
 
 
+# Delete a subset of existing users
+@app.route("/api/users/delete", methods=["DELETE"])
+@cross_origin(origin='chrome-extension://bebffpohmffmkmbmanhdpepoineaegai', headers=['Content- Type','Authorization'])
+def delete_users():
+    '''
+    Delete subset of users specified in request body
+    '''
+    request_body = request.json
+    if not request_body:
+        return Response(response=err.MISSING_REQUEST_BODY, status=400)
+    try:
+        db.delete_users(request_body)
+    except BadRequest as e:
+        return Response(response=e.message, status=400)
+    return Response(status=201)
+
+
+
+
 # Route to get user's password
 @app.route("/api/login", methods=["GET"])
 @cross_origin(origin='chrome-extension://bebffpohmffmkmbmanhdpepoineaegai', headers=['Content- Type','Authorization'])

@@ -89,7 +89,17 @@ class DB:
             "session_id" : None,
             "session_id_expires" : None,
             "vault" : []
-        })    
+        })
+
+
+    def delete_users(self, request_body):
+        try:
+            user_list = request_body['users']
+        except KeyError:
+            raise BadRequest(message=" Required attribute is missing.")
+        
+        for user_email in user_list:
+            self.client.users.delete_one({'email' : user_email})
 
 
     def fetch_user_password(self, email):
