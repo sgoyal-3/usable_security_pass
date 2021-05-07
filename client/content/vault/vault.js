@@ -110,6 +110,11 @@ function displayData(parsedData){
                 let passwordToggle = createPasswordToggle(password);
                 nextCell.appendChild(passwordToggle);
                 passwordFields.push(nextCell);
+            } else if (keys[j] === "hostname") {
+                let hyperlink = document.createElement("a");
+                hyperlink.href = 'https://' + dataElem[keys[j]];
+                hyperlink.innerHTML = dataElem[keys[j]];
+                nextCell.appendChild(hyperlink);
             } else {
                 nextCell.innerHTML = dataElem[keys[j]];
             }
@@ -173,7 +178,7 @@ window.addEventListener('load', () => {
     //let userEmail = getCookieValue('email');
     //let sessionId = getCookieValue('session-id');
     let userEmail = 'rookiemail2@comcast.net';
-    let sessionId = 'upn-Qnm4XYPNzNqJTsqyGZAINj-ftaWzVqrWdddtVOk=';
+    let sessionId = 'atko1hdmOLadOYV2SyBIqUk0eMlZ7JZsBc8abnt9emk=';
     axios.get(`https://mashypass-app.herokuapp.com/api/vault/all?email=${userEmail}&session-id=${sessionId}`)
     .then(function(vaultData) {
         axios.get(`https://mashypass-app.herokuapp.com/api/analytics/vault/reuse?email=${userEmail}&session-id=${sessionId}`)
