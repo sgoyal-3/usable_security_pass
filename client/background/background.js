@@ -246,81 +246,8 @@ We highly recommend that you change these passwords.`,
   })
 }
 
-displayReuseNotif({
-  num_reused: 1,
-  num_sites: 3,
-  websites: [
-    "www.example.com",
-    "www.example1.com",
-    "www.example2.com"
-  ]
-})
-
-
-
-
-
-
-
-
-
-
-
 
 let modalOpened = false;
-
-//these are now being taken care of by the long-term connection with onConnect
-/*
-chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
-    console.log(request);
-    sendResponse('pong');
-});
-*/
-// chrome.runtime.onMessage.addListener(
-//     function(request, sender, sendResponse) {
-//         console.log(request);
-//         if (request.modalOpened) {
-//             modalOpened = request.modalOpened;
-//             sendResponse('modal has been opened');
-//         } else if (request === "openModal?") {
-//             sendResponse({'openModal' : `${modalOpened}`})
-//         } else {
-//             sendResponse('pong');
-//         }
-        
-//     }
-// )
-
-
-/*
-Uh idk if we need this
-communication with content.js and popup.js. Both content.js and popup.js
-will communicate on the same port, so we should make sure to differentiate
-them if it becomes necessary
-*/
- // chrome.extension.onConnect.addListener(function(port) {
- //      console.log("Connected .....");
-
-
- //      port.onMessage.addListener(function(msg) {
- //           console.log("message recieved" + msg);
- //           console.log(msg);
-
- //           if (msg.modalOpened) {
- //                modalOpened = msg.modalOpened;
- //                port.postMessage('modal has been opened');
- //            } else if (msg == "openModal?") {
- //                port.postMessage("got message openModal?");
- //                port.postMessage({'openModal' : `${modalOpened}`})
- //            } else {
- //                port.postMessage('pong');
- //            }
-
-
- //           port.postMessage("Hi content.js");
- //      });
- // })
-
 
 /*
 This will allow us to detect a change in the url of the active tab
@@ -336,8 +263,6 @@ chrome.tabs.query({active: true, currentWindow: true},function(tabs) {
       console.log("Connected .....");
       port.postMessage("tabUrlChange")
     })
-
-
 }); 
 
 
@@ -376,39 +301,39 @@ function url_domain(data) {
 
           if (msg.type === 'show-reuse-alert') {
             displayReuseNotif(msg.data);
+          } 
+          
+          if (msg.type === 'save-cookies') {
+            email = msg.email;
+            session_id = msg.session_id;
+            console.log(email);
+            console.log(session_id);
           }
 
-           if (typeof(msg.username) != 'undefined'){
-              /* 
-              save credentials and url of log in page
-              when content sends them
+          if (typeof(msg.username) != 'undefined'){
+            /* 
+            save credentials and url of log in page
+            when content sends them
+            */
+            username = msg.username;
+            password = msg.password;
+            old_url = msg.url;
+            login_attempt = true;
+            console.log(username);
+            console.log(password);
+            console.log(old_url);
+            console.log(old_url);
+            console.log(new_url);
+          }
+          else if (msg == "modalclosed") {
+              /*once the modal has been closed by the user, we should no
+              longer open it on pages of the same domain
               */
-              username = msg.username;
-              password = msg.password;
-              old_url = msg.url;
-              login_attempt = true;
-              console.log(username);
-              console.log(password);
-              console.log(old_url);
-              console.log(old_url);
-              console.log(new_url);
-            }
-            else if (msg == "modalclosed") {
-                /*once the modal has been closed by the user, we should no
-                longer open it on pages of the same domain
-                */
-                login_attempt = false;
-            } 
-            else if(typeof(msg.email) != 'undefined' && typeof(msg.session_id) != 'undefined'){
-              email = msg.email;
-              session_id = msg.session_id;
-              console.log(email);
-              console.log(session_id);
-            }
-            else if(msg == "Cookies pls"){
-              port.postMessage({email:email, session_id:session_id});
-            }
-
+              login_attempt = false;
+          } 
+          else if(msg.type === 'send-cookies'){
+            port.postMessage({email:email, session_id:session_id});
+          }
       });
  })
 

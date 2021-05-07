@@ -114,38 +114,39 @@ function url_domain(data) {
 
           if (msg.type === 'show-reuse-alert') {
             displayReuseNotif(msg.data);
+          } 
+          
+          if (msg.type === 'save-cookies') {
+            email = msg.email;
+            session_id = msg.session_id;
+            console.log(email);
+            console.log(session_id);
           }
 
-           if (typeof(msg.username) != 'undefined'){
-              /* 
-              save credentials and url of log in page
-              when content sends them
+          if (typeof(msg.username) != 'undefined'){
+            /* 
+            save credentials and url of log in page
+            when content sends them
+            */
+            username = msg.username;
+            password = msg.password;
+            old_url = msg.url;
+            login_attempt = true;
+            console.log(username);
+            console.log(password);
+            console.log(old_url);
+            console.log(old_url);
+            console.log(new_url);
+          }
+          else if (msg == "modalclosed") {
+              /*once the modal has been closed by the user, we should no
+              longer open it on pages of the same domain
               */
-              username = msg.username;
-              password = msg.password;
-              old_url = msg.url;
-              login_attempt = true;
-              console.log(username);
-              console.log(password);
-              console.log(old_url);
-              console.log(old_url);
-              console.log(new_url);
-            }
-            else if (msg == "modalclosed") {
-                /*once the modal has been closed by the user, we should no
-                longer open it on pages of the same domain
-                */
-                login_attempt = false;
-            } 
-            else if(typeof(msg.email) != 'undefined' && typeof(msg.session_id) != 'undefined'){
-              email = msg.email;
-              session_id = msg.session_id;
-              console.log(email);
-              console.log(session_id);
-            }
-            else if(msg == "Cookies pls"){
-              port.postMessage({email:email, session_id:session_id});
-            }
+              login_attempt = false;
+          } 
+          else if(msg.type === 'send-cookies'){
+            port.postMessage({email:email, session_id:session_id});
+          }
       });
  })
 

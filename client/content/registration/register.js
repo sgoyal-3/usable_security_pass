@@ -47,7 +47,8 @@ window.addEventListener('load', function() {
 	                    document.cookie = `session-id=${resp.data}; path=/`;
 	                    document.cookie = `email=${email.value}; path=/`;
 	                    console.log(document.cookie);
-						port.postMessage({email: email.value, session_id:resp.data});
+						port.postMessage({type:'save-cookies', email: email.value, session_id:resp.data});
+						window.location.replace("/html/registration_successful.html");
 					})
 	                .catch(function(error) {
 	                    console.log(error);

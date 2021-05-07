@@ -25,7 +25,7 @@ window.addEventListener('load', function() {
         var session_id = getCookie("session-id");
         axios.get(`https://mashypass-app.herokuapp.com/api/session?email=${email}&session-id=${session_id}`)
         .then(function(response) {
-            port.postMessage({email: email, session_id: session_id});
+            port.postMessage({email: email, session_id: session_id}); // send cookies to background.js
             window.location.replace("/html/login_successful.html");
         })
         .catch(function(error) {

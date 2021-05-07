@@ -20,7 +20,7 @@ function getCookieValue(name) {
 }
 
 var email = "";
-var session_id = "";
+var sessionId = "";
 
 const event = new Event('build');
 
@@ -42,7 +42,7 @@ const event = new Event('build');
       }
       if(typeof(msg.email) != 'undefined' && typeof(msg.session_id) != 'undefined'){
         email = msg.email;
-        session_id = msg.session_id;
+        sessionId = msg.session_id;
         console.log("Email and session_ids retrieved");
         // Dispatch the event.
         window.dispatchEvent(event);
@@ -91,7 +91,8 @@ window.addEventListener('build', function (e) {
 * the filter in manifest.json
 */
 window.addEventListener("load", () => {
-    
+    port.postMessage({type:'send-cookies'});
+
     if (onRegistrationPage()){
         getUserSession(); 
         console.log("On a registration page")
@@ -110,27 +111,17 @@ window.addEventListener("load", () => {
 * for a new session-id
 */
 function getUserSession() {
-    if (document.cookie === "") {
-        console.log("No cookies, exiting function");
-    } else if (getCookieValue("email") === undefined || getCookieValue("session-id") === undefined) {
-        console.log("No cookies for email and session-id, exiting function");
-    } else {
-        let userEmail = getCookieValue("email");
-        let sessionId = getCookieValue("session-id");
-        console.log(userEmail);
-        console.log(sessionId);
-
-        // Check if user is logged in
-        axios.get(`https://mashypass-app.herokuapp.com/api/session?email=${userEmail}&session-id=${sessionId}`)
-        .then(function(response) {
-            console.log(response); // User is logged in, nothing else to do
-            console.log("User alread logged in, exiting function...");
-        })
-        .catch(function(error) {
-            console.log(error.response.data);
-            displayLoginPage();
-        })
-    }
+    port.postMessage({type:'send-cookies'});
+    // Check if user is logged in
+    axios.get(`https://mashypass-app.herokuapp.com/api/session?email=${email}&session-id=${sessionId}`)
+    .then(function(response) {
+        console.log(response); // User is logged in, nothing else to do
+        console.log("User alread logged in, exiting function...");
+    })
+    .catch(function(error) {
+        console.log(error.response.data);
+        displayLoginPage();
+    })
 }
 
 /*
@@ -197,14 +188,6 @@ function sendCreds(username, password, url){
     console.log(password);
     console.log(url);
     port.postMessage({username : username, password : password, url : url});
-}
-
-
-/*
-* sendCookies: Fetch user's cookies and send them to the background script
-*/
-function sendCookies(userEmail, sessionId){
-    port.postMessage({"email": userEmail, "session-id": sessionId});
 }
 
 
