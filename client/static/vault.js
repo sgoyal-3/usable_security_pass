@@ -26997,10 +26997,10 @@ window.addEventListener('load', () => {
     //let userEmail = getCookieValue('email');
     //let sessionId = getCookieValue('session-id');
     let userEmail = 'rookiemail2@comcast.net';
-    let sessionId = '5rtuc5Xsq7ggYF25V6E_x9yo-8ctKmhj9X3A1XcD1_0=';
-    axios.get(`http://localhost:5000/api/vault/all?email=${userEmail}&session-id=${sessionId}`)
+    let sessionId = 'upn-Qnm4XYPNzNqJTsqyGZAINj-ftaWzVqrWdddtVOk=';
+    axios.get(`https://mashypass-app.herokuapp.com/api/vault/all?email=${userEmail}&session-id=${sessionId}`)
     .then(function(vaultData) {
-        axios.get(`http://localhost:5000/api/analytics/vault/reuse?email=${userEmail}&session-id=${sessionId}`)
+        axios.get(`https://mashypass-app.herokuapp.com/api/analytics/vault/reuse?email=${userEmail}&session-id=${sessionId}`)
         .then(function(reuseData) {
             let parsedData = parseData(vaultData.data, reuseData.data);
             displayData(parsedData);
@@ -27016,14 +27016,7 @@ window.addEventListener('load', () => {
                     if (toggleButton.value == true) {
                         event.target.parentElement.parentElement.childNodes[0].nodeValue = filler;
                         toggleButton.value = false;
-                        //passwordField.innerHTML = filler;
-                        /*
-                        console.log(textToChange);
-                        textToChange.nodeValue = filler;
-                        toggleButton.value = false;
-                        */
                     } else {
-                        //event.target.parentElement.parentElement.childNodes[0].nodeValue = password;
                         textToChange.nodeValue = password;
                         event.target.parentElement.value = true;
                     } 
