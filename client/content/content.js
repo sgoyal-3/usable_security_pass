@@ -26720,9 +26720,10 @@ const event = new Event('build');
 
 
 // Listen for the event.
-/*
 window.addEventListener('build', function (e) { 
-        console.log('hi');
+    console.log('event has fired');
+    getUserSession();
+    /*
         let testEmail = "rookiemail@comcast.net";
         let url = "www.example2.com";
         let sessionId = "123456789"
@@ -26737,10 +26738,8 @@ window.addEventListener('build', function (e) {
             console.log(error.response.status);
             console.log(error.response.headers);
         })
-        
-
+    */
 }, false);
-*/
 
 
 /*
@@ -26749,10 +26748,12 @@ window.addEventListener('build', function (e) {
 */
 window.addEventListener("load", () => {
     
+
     if (onRegistrationPage()){
-        getUserSession(); 
         console.log("On a registration page")
+        port.postMessage({type:'send-cookies'});
         displayPasswordGenButton();
+        modifyPageContent();
     }
 });
 
@@ -26767,7 +26768,6 @@ window.addEventListener("load", () => {
 * for a new session-id
 */
 function getUserSession() {
-    port.postMessage({type:'send-cookies'});
     // Check if user is logged in
     axios.get(`https://mashypass-app.herokuapp.com/api/session?email=${email}&session-id=${sessionId}`)
     .then(function(response) {
@@ -26801,11 +26801,7 @@ function sendVaultCredentials(username, password) {
     let url = window.location.hostname;
     var key = CryptoJS.enc.Utf8.parse('1234567890123456');
     var encrypted = encrypt(password, key);
-     // let email = getCookieValue('email');
-    // let sessionId = getCookieValue('session-id');
-    let userEmail = 'rookiemail2@comcast.net';
-    let sessionId = 'CA_V5BLVMRh9QUonKGNZS_OzBkgGou8koi20NvBCxsA=';
-    axios.post(`https://mashypass-app.herokuapp.com/api/vault?session-id=${sessionId}&email=${userEmail}`, {
+    axios.post(`https://mashypass-app.herokuapp.com/api/vault?session-id=${sessionId}&email=${email}`, {
         'url': `${url}`,
         'username' : `${username}`,
         'password' : `${encrypted}`
@@ -27010,66 +27006,21 @@ function displayReuseStatistics(reuseStatistics) {
 //         Functions for Page Filtering
 /********************************************************/
 
-function search(){
+/*
+* modifyPageContent: Add event listeners to the page DOM that will show
+* modal popup when submit button is clicked
+*/
+function modifyPageContent(){
 
-    var username_exists = false;
-    var password_exists = false;
-
-    var username1 =  document.getElementById("email");
-    var password1 = document.getElementById("password");
-    if (typeof(username1) != 'undefined' && username1 != null)
-    {
-      // username1 Exists.
-      console.log("username1 exists");
-      username_exists = true;
-      
-    }
-
-    if (typeof(password1) != 'undefined' && password1 != null)
-    {
-      // password1 exists
-      console.log("password1 exists");
-      password_exists = true;
-      
-    }
-
-    console.log(username_exists);
-    console.log(password_exists);
-
-    //if username and password exists, put listener on submit button
-    if(password_exists && username_exists){
-
-        port.postMessage("Cookies pls");
-
-     
-
-        /*
-
-        COMMENT THIS BACK AFTER
-        trying to find a way for it detect when form is submitted via enter
-        key as well as click, but it doesn't seem to work
-        
-        console.log("putting listener on login-form");
-        var submit = document.getElementById("login-form");
-        submit.addEventListener("submit", function() 
-        {   
-            console.log("submitted");
-            var username_contents = document.getElementById("email").value;
-            var password_contents = document.getElementById("password").value;
-            sendCreds(username_contents, password_contents, window.location.href); 
-        });
-
-        var submit = document.getElementById("submit-button");
-        submit.addEventListener("click", function() 
-        {   
-            console.log("submitted");
-            var username_contents = document.getElementById("email").value;
-            var password_contents = document.getElementById("password").value;
-            sendCreds(username_contents, password_contents, window.location.href); 
-        });
-
-        */
-    }
+    var submit = document.getElementById("submit-button");
+    submit.addEventListener("click", function(e) 
+    {   
+        e.preventDefault();    
+        console.log("submitted");
+        var username_contents = document.getElementById("email").value;
+        var password_contents = document.getElementById("password").value;
+        displayModal();
+    });
 }
 
 
