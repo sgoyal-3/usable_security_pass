@@ -26826,6 +26826,14 @@ var axios = require('axios');
 var CryptoJS = require("crypto-js");
 var passwordModule = require('../registration/password.js');
 
+
+/* Global Variables */
+var passwordToggles = [];
+var passwordFields = [];
+
+
+
+
 /*
 * getCookieValue: get the value of a particular cookie
 */
@@ -26921,12 +26929,11 @@ function displayData(parsedData){
             let nextCell = document.createElement("TD");
             if (keys[j] === "password") {
                 let password = dataElem[keys[j]];
-                nextCell.id = password;
+                nextCell.password = password;
                 nextCell.innerHTML = "*".repeat(password.length);
-                let passwordToggle = createPasswordToggle();
-                console.log(passwordToggle);
+                let passwordToggle = createPasswordToggle(password);
                 nextCell.appendChild(passwordToggle);
-                console.log(nextCell);
+                passwordFields.push(nextCell);
             } else {
                 nextCell.innerHTML = dataElem[keys[j]];
             }
@@ -26942,10 +26949,11 @@ function displayData(parsedData){
 * createPasswordToggle: Create the HTML necessary for the password
 * visibility toggle switch
 */
-function createPasswordToggle() {
+function createPasswordToggle(password) {
     let passwordToggle = document.createElement("LABEL");
     passwordToggle.classList.add("switch");
-    passwordToggle.value = "OFF";
+    passwordToggle.value = false;
+    passwordToggle.password = password;
 
     let checkbox = document.createElement("INPUT");
     checkbox.type = "checkbox";
@@ -26955,6 +26963,7 @@ function createPasswordToggle() {
     span.classList.add("slider");
     passwordToggle.appendChild(span);
 
+    passwordToggles.push(passwordToggle);
     return passwordToggle;
 }
 
@@ -26962,15 +26971,19 @@ function createPasswordToggle() {
 /*
 * showPassword
 */
-function showPassword(toggleElement) {
-    let passwordElem = toggleElement.parentElement;
-    let password = passwordElem.id;
-    if (toggleElement.value === "OFF") {
-        passwordElem.innerHTML = password;
-        toggleElement.value = "ON";
+function showPassword(index) {
+    let toggle = passwordToggles[index];
+    if (toggle == undefined) {
+        console.log("Why is this undefined");
+        return;
+    }
+    let passwordField = passwordFields[index];
+    if (toggle.value === "OFF") {
+        toggle.value = "ON";
+        passwordField.innerHTML = toggle.password;
     } else {
-        passwordElem.innerHTML = "*".repeat(password.length);
-        toggleElement.value = "OFF";
+        toggle.value = "OFF";
+        passwordField.innerHTML = "*".repeat(passwordField.password.length);
     }
 }
 
@@ -26984,25 +26997,42 @@ window.addEventListener('load', () => {
     //let userEmail = getCookieValue('email');
     //let sessionId = getCookieValue('session-id');
     let userEmail = 'rookiemail2@comcast.net';
-    let sessionId = '37rG90YpCmY7lhNVphAuPOWSjTmQ8Vt1I3ox9ywPIvY=';
+    let sessionId = '5rtuc5Xsq7ggYF25V6E_x9yo-8ctKmhj9X3A1XcD1_0=';
     axios.get(`http://localhost:5000/api/vault/all?email=${userEmail}&session-id=${sessionId}`)
     .then(function(vaultData) {
         axios.get(`http://localhost:5000/api/analytics/vault/reuse?email=${userEmail}&session-id=${sessionId}`)
         .then(function(reuseData) {
             let parsedData = parseData(vaultData.data, reuseData.data);
             displayData(parsedData);
+            document.getElementById('table-body').addEventListener('click', function(event) {
+                console.log(event.target.nodeName);
+                if (event.target.nodeName === "SPAN") {
+                    let password = event.target.parentElement.password;
+                    let filler = "*".repeat(password.length);
+                    let toggleButton = event.target.parentElement;
+                    console.log(toggleButton.value);
+                    let passwordField = event.target.parentElement.parentElement;
+                    let textToChange = passwordField.childNodes[0];
+                    if (toggleButton.value == true) {
+                        event.target.parentElement.parentElement.childNodes[0].nodeValue = filler;
+                        toggleButton.value = false;
+                        //passwordField.innerHTML = filler;
+                        /*
+                        console.log(textToChange);
+                        textToChange.nodeValue = filler;
+                        toggleButton.value = false;
+                        */
+                    } else {
+                        //event.target.parentElement.parentElement.childNodes[0].nodeValue = password;
+                        textToChange.nodeValue = password;
+                        event.target.parentElement.value = true;
+                    } 
+                }
+            })
         })
         .catch(function(error) {
             console.log(error);
         })
-        .then(function() {
-            let toggleButtons = document.getElementsByClassName("switch");
-            for (var i = 0; i < toggleButtons.length; i++){
-                
-                toggleButtons[i].addEventListener('click', showPassword(toggleButtons[i]));
-            }
-        })
-
     })
     .catch(function(error) {
         console.log(error.response.data);
