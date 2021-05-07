@@ -63,14 +63,9 @@ const event = new Event('build');
 
 
 // Listen for the event.
+/*
 window.addEventListener('build', function (e) { 
         console.log('hi');
-        /*
-       let url = document.location;
-        console.log(session_id);
-        console.log(email);
-        console.log(url);
-        */
         let testEmail = "rookiemail@comcast.net";
         let url = "www.example2.com";
         let sessionId = "123456789"
@@ -88,13 +83,8 @@ window.addEventListener('build', function (e) {
         
 
 }, false);
+*/
 
-
- /*
-search for username/password fields
-wait until page js runs and dom fully loaded to do so
- */
-//window.addEventListener ("load", () => {displayModal("username", "password")}, false);
 
 /*
 * Main driver code that will be executed on every webpage that matches
@@ -102,10 +92,8 @@ wait until page js runs and dom fully loaded to do so
 */
 window.addEventListener("load", () => {
     
-    displayModal("username", "password");
-
     if (onRegistrationPage()){
-        //getUserSession(); 
+        getUserSession(); 
         console.log("On a registration page")
         displayPasswordGenButton();
     }
@@ -126,11 +114,11 @@ function getUserSession() {
         console.log("No cookies, exiting function");
     } else if (getCookieValue("email") === undefined || getCookieValue("session-id") === undefined) {
         console.log("No cookies for email and session-id, exiting function");
-        document.cookie = 'email=rookiemail@comcast.net; path=/';
-        document.cookie = 'session-id=1234567890; path=/';
     } else {
         let userEmail = getCookieValue("email");
         let sessionId = getCookieValue("session-id");
+        console.log(userEmail);
+        console.log(sessionId);
 
         // Check if user is logged in
         axios.get(`https://mashypass-app.herokuapp.com/api/session?email=${userEmail}&session-id=${sessionId}`)
@@ -215,14 +203,8 @@ function sendCreds(username, password, url){
 /*
 * sendCookies: Fetch user's cookies and send them to the background script
 */
-function sendCookies(){
-    if (document.cookie === ""){
-        console.log("No cookies set, exiting...");
-    } else {
-        let userEmail = getCookieValue('email'); 
-        let sessionId = getCookieValue('session-id');
-        port.postMessage({"email" : `${userEmail}`, "session_id" : `${sessionId}`});
-    }
+function sendCookies(userEmail, sessionId){
+    port.postMessage({"email": userEmail, "session-id": sessionId});
 }
 
 
@@ -449,8 +431,6 @@ function search(){
 
         */
     }
-    
-
 }
 
 
@@ -475,6 +455,8 @@ request registration point if current page is registration_successul.html
 // if(window.location.pathname+window.location.search == "html/registration_successul.html"){
 //     port.postMessage("Registration point request");
 // }
+
+
 
 
 

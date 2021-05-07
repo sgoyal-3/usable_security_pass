@@ -1,6 +1,12 @@
 var bcrypt = require('bcryptjs');
 const axios = require('axios');
-var passwordModule = require('./password.js')
+var passwordModule = require('./password.js');
+
+
+//establish communication connection with background.js
+var port = chrome.extension.connect({
+	name: "Sample Communication"
+});
 
 /*
 * Wait until page has loaded, then add event listener to the 
@@ -35,19 +41,17 @@ window.addEventListener('load', function() {
 					//this code taken from login.js - go through login process automatically
 					//upon registration
 					let token = "oPB6jRIlzTSqO9J4MgY3";
-	                axios.put(`http://localhost:5000/api/login?email=${email.value}&token=${token}`)
+	                axios.put(`https://mashypass-app.herokuapp.com/api/login?email=${email.value}&token=${token}`)
 	                .then(function(resp) {
 	                    console.log(resp);
 	                    document.cookie = `session-id=${resp.data}; path=/`;
 	                    document.cookie = `email=${email.value}; path=/`;
 	                    console.log(document.cookie);
-	                })
+						port.postMessage({email: email.value, session_id:resp.data});
+					})
 	                .catch(function(error) {
 	                    console.log(error);
 	                })
-
-
-					//window.location.replace("/html/registration_successful.html");
 				}
 			})
 			.catch(function(error) {
