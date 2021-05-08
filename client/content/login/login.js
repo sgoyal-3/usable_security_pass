@@ -20,7 +20,7 @@ function getSessionId(email){
         document.cookie = `email=${email}; path=/`;
         console.log(document.cookie);
         //send session id and email to background.js so content.js can access it 
-        port.postMessage({email: email, session_id: resp.data})
+        port.postMessage({type: 'save-cookies', email: email, session_id: resp.data})
     })
     .catch(function(error) {
         console.log(error);
@@ -45,8 +45,8 @@ window.addEventListener('load', function() {
             if (bcrypt.compareSync(password, dbPassword)) {
                 console.log("Access Granted");
                 //display login success
-                window.location.replace("/html/login_successful.html");
-                getSessionId(email); // Get our session-id tokens
+                getSessionId(email);
+                //setTimeout(() => {window.location.replace("/html/login_successful.html", 2000)});
             } else {
                 console.log("Access Denied");
             }

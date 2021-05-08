@@ -301,7 +301,13 @@ function url_domain(data) {
 
           if (msg.type === 'show-reuse-alert') {
             displayReuseNotif(msg.data);
-          } 
+          }
+          
+          if (msg.type === 'open-modal-request' && login_attempt == true) {
+            console.log("sending openModal message...");
+            port.postMessage({'type': 'openModal', 'username' : username, 'password' : password});
+          }
+          
           
           if (msg.type === 'save-cookies') {
             email = msg.email;
@@ -315,15 +321,15 @@ function url_domain(data) {
             save credentials and url of log in page
             when content sends them
             */
+            console.log('received login credentials');
             username = msg.username;
             password = msg.password;
             old_url = msg.url;
             login_attempt = true;
             console.log(username);
             console.log(password);
-            console.log(old_url);
-            console.log(old_url);
-            console.log(new_url);
+            //port.postMessage({'type': 'openModal', 'username': username, 'password':password});
+
           }
           else if (msg == "modalclosed") {
               /*once the modal has been closed by the user, we should no

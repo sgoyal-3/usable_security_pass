@@ -32,30 +32,34 @@ const event = new Event('build');
 
 //listen for request to open modal
  port.onMessage.addListener(function(msg) {
-      console.log("message recieved" + msg);
 
-      if(typeof(msg.username) != 'undefined'){
+    console.log("message recieved" + msg);
+
+
+
+    if(typeof(msg.username) != 'undefined'){
         console.log("opening modal");
         console.log(msg.username);
         console.log(msg.password);
         displayModal(msg.username, msg.password);
-      }
-      if(typeof(msg.email) != 'undefined' && typeof(msg.session_id) != 'undefined'){
+    }
+    if(typeof(msg.email) != 'undefined' && typeof(msg.session_id) != 'undefined'){
         email = msg.email;
         sessionId = msg.session_id;
         console.log("Email and session_ids retrieved");
         // Dispatch the event.
         window.dispatchEvent(event);
-      }
-      // if(typeof(msg.registration_point) != 'undefined'){
-      //   //fill in registration point field in registration-successful.html if that is the current page
-      //   console.log("got registration point and it is: ");
-      //   console.log(msg.registration_point);
-      // }
+    }
 
-      if (msg.type === "show-vault"){
-          console.log("Received message to open vault");
-      }
+    // if(typeof(msg.registration_point) != 'undefined'){
+    //   //fill in registration point field in registration-successful.html if that is the current page
+    //   console.log("got registration point and it is: ");
+    //   console.log(msg.registration_point);
+    // }
+
+    if (msg.type === "show-vault"){
+        console.log("Received message to open vault");
+    }
 
 
 
@@ -66,22 +70,6 @@ const event = new Event('build');
 window.addEventListener('build', function (e) { 
     console.log('event has fired');
     getUserSession();
-    /*
-        let testEmail = "rookiemail@comcast.net";
-        let url = "www.example2.com";
-        let sessionId = "123456789"
-
-        console.log("sending axios now");
-        axios.get(`https://mashypass-app.herokuapp.com/api/vault?session-id=${sessionId}&email=${testEmail}&url=${url}`, {})
-        .then(function (response) {
-            console.log(response);
-        })
-        .catch(function (error) {
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-        })
-    */
 }, false);
 
 
@@ -90,7 +78,8 @@ window.addEventListener('build', function (e) {
 * the filter in manifest.json
 */
 window.addEventListener("load", () => {
-    
+
+    port.postMessage({'type':'open-modal-request'});
 
     if (onRegistrationPage()){
         console.log("On a registration page")
@@ -163,8 +152,8 @@ function sendVaultCredentials(username, password) {
 /*
 * getReuseStatistics: Get user's password reuse statistics from backend
 */
-function getReuseStatistics(userEmail, sessionId) {
-    axios.get(`https://mashypass-app.herokuapp.com/api/analytics/vault/reuse?email=${userEmail}&session-id=${sessionId}`)
+function getReuseStatistics(userEmail, userSessionId) {
+    axios.get(`https://mashypass-app.herokuapp.com/api/analytics/vault/reuse?email=${userEmail}&session-id=${userSessionId}`)
     .then(function(response) {
         console.log(response);
         displayReuseStatistics(response.data);
@@ -199,12 +188,14 @@ function displayLoginPage() {
     fetch(chrome.runtime.getURL('/html/login_modal.html')).then(r => r.text()).then(html => {
         document.body.insertAdjacentHTML('beforeend', html);
     })
+    /*
     .then(() => {
         document.getElementById("close").addEventListener('click', (e) => {
             e.preventDefault();
             document.getElementById('login-modal').style.display = "none";
         })
     })
+    */
 }
 
 
@@ -360,9 +351,10 @@ function modifyPageContent(){
     {   
         e.preventDefault();    
         console.log("submitted");
-        var username_contents = document.getElementById("email").value;
-        var password_contents = document.getElementById("password").value;
-        displayModal();
+        var urlContents = window.location.hostname;
+        var usernameContents = document.getElementById("email").value;
+        var passwordContents = document.getElementById("password").value;
+        sendCreds(usernameContents, passwordContents, urlContents);
     });
 }
 
