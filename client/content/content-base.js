@@ -201,6 +201,7 @@ function displayLoginPage() {
         console.log(document.getElementById("login"));
         document.getElementById("login").addEventListener('click', (e) => {
             e.preventDefault();
+            console.log("click event callback...");
             loginModule.loginUser();
         })
     })

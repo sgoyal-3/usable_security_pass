@@ -185,6 +185,16 @@
         transform: rotate(45deg);
         cursor: pointer;
     }
+
+    #login-successful-modal {
+        font: 13px/20px "Lucida Grande", Tahoma, Verdana, sans-serif;
+        color: #404040;
+        background: #0ca3d2;
+        display: block;
+        margin-right: 0%;
+        margin-top: 0%;
+        display: none;
+    }
 </style>    
 
 
@@ -193,8 +203,8 @@
     <div class="login">
         <h1>Login to MASHYPass</h1>
         <form method="post" action="">
-            <p><input id="email" type="text" name="login" value="" placeholder="Username or Email" required></p>
-            <p><input id="password" type="password" name="password" value="" placeholder="Password" required></p>
+            <p><input id="mashy-email" type="text" name="login" value="" placeholder="Username or Email" required></p>
+            <p><input id="mashy-password" type="password" name="password" value="" placeholder="Password" required></p>
             <p class="remember_me">
             <label>
                 <input type="checkbox" name="remember_me" id="remember_me">
@@ -211,3 +221,9 @@
             <p>Learn more/visit our homepage <a id="home-link" href="home.html">here</a>.</p>
         </div>
 </dialog>
+
+<dialog id="login-successful-modal">
+    <h2>All set!</h2>
+</dialog>
+
+

@@ -26929,7 +26929,6 @@ function displayLoginPage() {
     fetch(chrome.runtime.getURL('/html/login_modal.html')).then(r => r.text()).then(html => {
         document.body.insertAdjacentHTML('beforeend', html);
     })
-    
     .then(() => {
         document.getElementById("close").addEventListener('click', (e) => {
             e.preventDefault();
@@ -26938,6 +26937,7 @@ function displayLoginPage() {
         console.log(document.getElementById("login"));
         document.getElementById("login").addEventListener('click', (e) => {
             e.preventDefault();
+            console.log("click event callback...");
             loginModule.loginUser();
         })
     })
@@ -27170,9 +27170,18 @@ function getSessionId(email){
         console.log(resp);
         document.cookie = `session-id=${resp.data}; path=/`;
         document.cookie = `email=${email}; path=/`;
-        console.log(document.cookie);
         //send session id and email to background.js so content.js can access it 
+        console.log("sending cookies to background....");
         port.postMessage({type: 'save-cookies', email: email, session_id: resp.data})
+    })
+    .then(function() {
+        if (window.location.host === "chrome-extension://aofelgdcnljcjeejddhcknappobidfch") {
+            window.location.replace("/html/login_successful.html");
+        } else {
+            document.getElementById('login-modal').style.display = 'none';
+            document.getElementById('login-successful-modal').style.display = 'flex'; 
+        }
+        
     })
     .catch(function(error) {
         console.log(error);
@@ -27187,8 +27196,8 @@ function getSessionId(email){
 * background.js
 */
 function loginUser(){
-    let email = document.getElementById("email").value;
-    let password = document.getElementById("password").value;
+    let email = document.getElementById("mashy-email").value;
+    let password = document.getElementById("mashy-password").value;
 
     console.log(email);
     // Get user's hashed password from server
@@ -27200,7 +27209,6 @@ function loginUser(){
             console.log("Access Granted");
             //display login success
             getSessionId(email);
-            setTimeout(() => {window.location.replace("/html/login_successful.html", 2000)});
         } else {
             console.log("Access Denied");
         }
