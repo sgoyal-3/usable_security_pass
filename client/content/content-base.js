@@ -11,6 +11,7 @@ whose URL fits the matches clause specified in manifest.json
 var CryptoJS = require("crypto-js");
 var axios = require('axios');
 var passwordModule = require('./registration/password.js');
+var loginModule = require('./login/login.js');
 
 
 function getCookieValue(name) {
@@ -46,6 +47,8 @@ const event = new Event('build');
     if(typeof(msg.email) != 'undefined' && typeof(msg.session_id) != 'undefined'){
         email = msg.email;
         sessionId = msg.session_id;
+        document.cookie = `session-id=${sessionId}; path=/`;
+        document.cookie = `email=${email}; path=/`;
         console.log("Email and session_ids retrieved");
         // Dispatch the event.
         window.dispatchEvent(event);
@@ -130,10 +133,12 @@ function encrypt(msgString, key) {
 * sendVaultCredentials: Send a user's vault credentials to the server
 */
 function sendVaultCredentials(username, password) {
+    let userEmail = getCookieValue('email');
+    let userSessionId = getCookieValue('session-id');
     let url = window.location.hostname;
     var key = CryptoJS.enc.Utf8.parse('1234567890123456');
     var encrypted = encrypt(password, key);
-    axios.post(`https://mashypass-app.herokuapp.com/api/vault?session-id=${sessionId}&email=${email}`, {
+    axios.post(`https://mashypass-app.herokuapp.com/api/vault?session-id=${userSessionId}&email=${userEmail}`, {
         'url': `${url}`,
         'username' : `${username}`,
         'password' : `${encrypted}`
@@ -141,7 +146,7 @@ function sendVaultCredentials(username, password) {
     .then(function (response) {
         console.log(response);
         // Check reuse statistics after sending to vault
-        getReuseStatistics(userEmail, sessionId);
+        getReuseStatistics(userEmail, userSessionId);
     })
     .catch(function (error) {
         console.log(error.response.data);
@@ -188,14 +193,17 @@ function displayLoginPage() {
     fetch(chrome.runtime.getURL('/html/login_modal.html')).then(r => r.text()).then(html => {
         document.body.insertAdjacentHTML('beforeend', html);
     })
-    /*
     .then(() => {
         document.getElementById("close").addEventListener('click', (e) => {
             e.preventDefault();
             document.getElementById('login-modal').style.display = "none";
         })
+        console.log(document.getElementById("login"));
+        document.getElementById("login").addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModule.loginUser();
+        })
     })
-    */
 }
 
 

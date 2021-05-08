@@ -51,8 +51,8 @@ function getUserSession(){
     } else {
         // If cookies are set, check with server to see if session is expired
         console.log("cookies set");
-        var email = getCookie("email");
-        var session_id = getCookie("session-id");
+        var email = getCookieValue("email");
+        var session_id = getCookieValue("session-id");
         axios.get(`https://mashypass-app.herokuapp.com/api/session?email=${email}&session-id=${session_id}`)
         .then(function(response) {
             console.log(response);
@@ -173,12 +173,12 @@ function showPassword(index) {
 *Driver code for vault page
 */
 window.addEventListener('load', () => {
-    //getUserSession(); // First make sure the user is logged in
+    getUserSession(); // First make sure the user is logged in
 
-    //let userEmail = getCookieValue('email');
-    //let sessionId = getCookieValue('session-id');
-    let userEmail = 'rookiemail2@comcast.net';
-    let sessionId = 'atko1hdmOLadOYV2SyBIqUk0eMlZ7JZsBc8abnt9emk=';
+    let userEmail = getCookieValue('email');
+    let sessionId = getCookieValue('session-id');
+    //let userEmail = 'rookiemail2@comcast.net';
+    //let sessionId = 'atko1hdmOLadOYV2SyBIqUk0eMlZ7JZsBc8abnt9emk=';
     axios.get(`https://mashypass-app.herokuapp.com/api/vault/all?email=${userEmail}&session-id=${sessionId}`)
     .then(function(vaultData) {
         axios.get(`https://mashypass-app.herokuapp.com/api/analytics/vault/reuse?email=${userEmail}&session-id=${sessionId}`)

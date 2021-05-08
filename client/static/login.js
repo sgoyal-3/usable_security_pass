@@ -26765,36 +26765,48 @@ function getSessionId(email){
 }
 
 
+/*
+* loginUser: check user's entered credentials against server credentials
+* If they are correct, log the user in, set cookies and send values to 
+* background.js
+*/
+function loginUser(){
+    let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
+
+    console.log(email);
+    // Get user's hashed password from server
+    axios.get(`https://mashypass-app.herokuapp.com/api/login?email=${email}`)
+    .then(function(response) {
+        console.log(response)
+        let dbPassword = response.data;
+        if (bcrypt.compareSync(password, dbPassword)) {
+            console.log("Access Granted");
+            //display login success
+            getSessionId(email);
+            setTimeout(() => {window.location.replace("/html/login_successful.html", 2000)});
+        } else {
+            console.log("Access Denied");
+        }
+    })
+    .catch(function(error) {
+        console.log(error);
+        console.log("User with email does not exist");
+    });
+}
+
+
 window.addEventListener('load', function() {
     let login = document.getElementById("login");
     login.addEventListener('click', function(e) {
         e.preventDefault();
-        let email = document.getElementById("email").value;
-        let password = document.getElementById("password").value;
-
-        console.log(email);
-        // Get user's hashed password from server
-        axios.get(`https://mashypass-app.herokuapp.com/api/login?email=${email}`)
-        .then(function(response) {
-            console.log(response)
-            let dbPassword = response.data;
-            if (bcrypt.compareSync(password, dbPassword)) {
-                console.log("Access Granted");
-                //display login success
-                getSessionId(email);
-                //setTimeout(() => {window.location.replace("/html/login_successful.html", 2000)});
-            } else {
-                console.log("Access Denied");
-            }
-        })
-        .catch(function(error) {
-            console.log(error);
-            console.log("User with email does not exist");
-        });
-
+        loginUser();
     });
-
 })
+
+module.exports.getSessionId = getSessionId;
+module.exports.loginUser = loginUser;
+
 
 
 },{"axios":189,"bcryptjs":216}],189:[function(require,module,exports){
