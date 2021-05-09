@@ -26939,6 +26939,9 @@ function displayData(parsedData){
                 hyperlink.href = 'https://' + dataElem[keys[j]];
                 hyperlink.innerHTML = dataElem[keys[j]];
                 nextCell.appendChild(hyperlink);
+            } else if (keys[j] === "isReused") {
+                nextCell.innerHTML = dataElem[keys[j]];
+                nextCell.appendChild(createDeleteButton(dataElem.hostname));
             } else {
                 nextCell.innerHTML = dataElem[keys[j]];
             }
@@ -26971,6 +26974,27 @@ function createPasswordToggle(password) {
     passwordToggles.push(passwordToggle);
     return passwordToggle;
 }
+
+/*
+* Add the button that will allow users to delete entries 
+* from their vault
+*/
+function createDeleteButton(hostname) {
+    let deleteButton = document.createElement("IMG");
+    deleteButton.title = "Delete Vault Entry"; 
+    deleteButton.style.position = "relative";
+    deleteButton.style.left = "60%";
+    deleteButton.style.cursor = "pointer";
+    deleteButton.hostname = hostname;
+    deleteButton.src = "../assets/delete.png";
+    deleteButton.alt = "delete icon";
+    deleteButton.height = "18";
+    deleteButton.width = "15";
+    return deleteButton;
+}
+
+
+
 
 
 /*
@@ -27025,6 +27049,22 @@ window.addEventListener('load', () => {
                         textToChange.nodeValue = password;
                         event.target.parentElement.value = true;
                     } 
+                } else if (event.target.nodeName === 'IMG') {
+                    let deleteVerification = document.getElementById('delete-verification');
+                    deleteVerification.style.display = "flex";
+
+                    document.getElementById('yes-delete').addEventListener('click', () => {
+                        let url = event.target.hostname;
+                        axios.delete(`https://mashypass-app.herokuapp.com/api/vault?email=${userEmail}&url=${url}&session-id=${sessionId}`)
+                        .then(function(response) {
+                            console.log(response);
+                        })
+                        .catch(function(error) {
+                            console.log(error.response.data);
+                        })
+                    })
+
+
                 }
             })
         })

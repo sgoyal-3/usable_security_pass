@@ -133,32 +133,55 @@
         .password-cell {
           display: inline;
         }
+
+        .delete-button {
+          position: relative;
+          left: 60%;
+          cursor: pointer;
+        }
+
+        #delete-verification {
+          position: absolute;
+          display: none;
+          height: 200px;
+          width: 250px;
+          margin-top: 25px;
+          margin-right: 10%;
+        }
+
       </style>
     </head>
     <body>
-        <section>
-            <!--for demo wrap-->
-            <h1>Your Vault</h1>
-            <div class="tbl-header">
-              <table cellpadding="0" cellspacing="0" border="0">
-                <thead>
-                  <tr>
-                    <th>Hostname</th>
-                    <th>Password</th>
-                    <th>Strength</th>
-                    <th>Time To Crack</th>
-                    <th>Reused</th>
-                  </tr>
-                </thead>
-              </table>
-            </div>
-            <div class="tbl-content">
-              <table cellpadding="0" cellspacing="0" border="0">
-                <tbody id="table-body">
-                </tbody>
-              </table>
-            </div>
-          </section>
+      <dialog id="delete-verification">
+        <h3>Are you sure you wish to delete this vault entry?</h3>
+        <button id="yes-delete">Yes, Delete</button>
+        <button id="no-keep">No, Keep</button>
+      </dialog>
+      <section>
+        <!--for demo wrap-->
+        <h1>Your Vault</h1>
+        <div class="tbl-header">
+          <table cellpadding="0" cellspacing="0" border="0">
+            <thead>
+              <tr>
+                <th>Hostname</th>
+                <th>Password</th>
+                <th>Strength</th>
+                <th>Time To Crack</th>
+                <th>Reused</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        <div class="tbl-content">
+          <table cellpadding="0" cellspacing="0" border="0">
+            <tbody id="table-body">
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      
     </body>
     
 </html>
