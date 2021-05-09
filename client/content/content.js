@@ -26955,6 +26955,17 @@ function displayPasswordGenButton() {
         passwordInput.parentElement.insertAdjacentHTML('beforeend', html);
     })
     .then(() => {
+        window.addEventListener('click', ({ target }) => {
+            let clickInsidePopup = (target.id == 'dialog-box' || 
+                                    target.parentElement.id == 'dialog-box' ||
+                                    target.parentElement.parentElement.id == 'dialog-box');
+            if (!clickInsidePopup && target.id !== 'lock-icon-container' && target.id !== 'lock-icon') {
+                let dialogBox = document.getElementById('dialog-box');
+                dialogBox.style.display = "none";
+                dialogBox.value = "OFF";
+            }
+        })
+
         document.getElementById("lock-icon-container").addEventListener("click", () => {
 
             let dialogBox = document.getElementById("dialog-box");
