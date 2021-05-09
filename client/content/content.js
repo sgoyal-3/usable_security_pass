@@ -27085,10 +27085,12 @@ function fillInPasswordFeedback(passwordInput) {
 * in order to alert user to password reuse via browser notification
 */
 function displayReuseStatistics(reuseStatistics) {
-    port.postMessage({
-        "type": "show-reuse-alert",
-        "data": reuseStatistics
-    })
+    if (reuseStatistics.num_reused > 0) {
+        port.postMessage({
+            "type": "show-reuse-alert",
+            "data": reuseStatistics
+        })
+    }
 }
 
 

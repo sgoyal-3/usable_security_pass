@@ -1,313 +1,168 @@
 <!DOCTYPE html>
 <html>
-    <head>
+<head>
+    <style>
+    * {
+    box-sizing: border-box;
+    }
 
+    body {
+    font-family: Arial;
+    padding: 10px;
+    background: #f1f1f1;
+    }
 
-        <title>MASHYPass</title>
+    /* Header/Blog Title */
+    .header {
+        padding: 30px;
+        text-align: center;
+        background: #0ca3d2;
+        color: white;
+    }
 
-        <script src="../content/home.js"></script>
+    .header h1 {
+        font-size: 50px;
+        font-family: Arial, Helvetica, sans-serif;
+    }
 
-        <style>
-            /*
-            NAV BAR STYLING
-            margin: 27px auto 0;
-            */
+    /* Style the top navigation bar */
+    .topnav {
+        overflow: hidden;
+        background-color: #777;
+    }
 
-            .navbar {
-                float: left;
-            }
+    /* Style the topnav links */
+    .topnav a {
+    float: left;
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    }
 
-            .header {
-                float: right;
-            }
+    /* Change color on hover */
+    .topnav a:hover {
+    background-color: #ddd;
+    color: black;
+    }
 
-            nav { 
-                margin-left: 0px;
-                margin-top: 10px;
-                position: relative;
-                width: 590px;
-                height: 50px;
-                background-color: #34495e;
-                border-radius: 8px;
-                box-shadow: 2px 2px;
-                font-size: 0;
-                position: fixed;
-                overflow: hidden;
-                z-index: 1;
-            }
-            nav a {
-                line-height: 50px;
-                height: 100%;
-                font-size: 15px;
-                display: inline-block;
-                position: relative;
-                z-index: 1;
-                text-decoration: none;
-                text-transform: uppercase;
-                text-align: center;
-                color: white;
-                cursor: pointer;
-            }
-            nav .animation {
-                position: absolute;
-                height: 100%;
-                top: 0;
-                z-index: 0;
-                transition: all .5s ease 0s;
-                border-radius: 8px;
-            }
-            a:nth-child(1) {
-                width: 100px;
-            }
-            a:nth-child(2) {
-                width: 110px;
-            }
-            a:nth-child(3) {
-                width: 100px;
-            }
-            a:nth-child(4) {
-                width: 160px;
-            }
-            a:nth-child(5) {
-                width: 120px;
-            }
-            nav .start-home, a:nth-child(1):hover~.animation {
-                width: 100px;
-                left: 0;
-                background-color: #1abc9c;
-            }
-            nav .start-about, a:nth-child(2):hover~.animation {
-                width: 110px;
-                left: 100px;
-                background-color: #e74c3c;
-            }
-            nav .start-blog, a:nth-child(3):hover~.animation {
-                width: 100px;
-                left: 210px;
-                background-color: #3498db;
-            }
-            nav .start-portefolio, a:nth-child(4):hover~.animation {
-                width: 160px;
-                left: 310px;
-                background-color: #9b59b6;
-            }
-            nav .start-contact, a:nth-child(5):hover~.animation {
-                width: 120px;
-                left: 470px;
-                background-color: #e67e22;
-            }
+    /* Create two unequal columns that floats next to each other */
+    /* Left column */
+    .leftcolumn {   
+    float: left;
+    width: 75%;
+    }
 
-            body {
-                font-size: 12px;
-                font-family: sans-serif;
-                background: #E4DEDE;
-            }
+    /* Right column */
+    .rightcolumn {
+    float: left;
+    width: 25%;
+    background-color: #f1f1f1;
+    padding-left: 20px;
+    }
 
-            /*
-            HEADER/TEXT STYLING
-            */
-            h1 {
-                text-align: center;
-                margin-top: 20px;
-                margin-right: 75px;
-                text-align: center;
-                font-size: 30px;
-                color: #ecf0f1;
-                text-shadow: 2px 2px 4px #000000;
-                font-family: Arial, Helvetica, sans-serif; 
-                font-size: 40px;
-            }
+    /* Fake image */
+    .fakeimg {
+    background-color: #aaa;
+    width: 100%;
+    padding: 20px;
+    }
 
-            /*
-            * CONNECTED BULLET LIST
-            */
-            /* No normal bullets please */
-            ul {
-                list-style-type: none;
-            }
+    /* Add a card effect for articles */
+    .card {
+    background-color: white;
+    padding: 20px;
+    margin-top: 20px;
+    }
 
-            li {
-            /* You need to turn on relative positioning so the line is placed relative to the item rather than absolutely on the page */
-                position: relative;
-                
-                /* Use padding to space things out rather than margins as the line would get broken up otherwise */
-                margin: 0;
-                padding-bottom: 275px;
-                padding-left: 160px;
-            }
+    /* Clear floats after the columns */
+    .row:after {
+    content: "";
+    display: table;
+    clear: both;
+    }
 
-            #first-elem {
-                padding-top: 190px;
-            }
+    /* Footer */
+    .footer {
+    padding: 20px;
+    text-align: center;
+    background: #ddd;
+    margin-top: 20px;
+    }
 
+    /* Responsive layout - when the screen is less than 800px wide, make the two columns stack on top of each other instead of next to each other */
+    @media screen and (max-width: 800px) {
+    .leftcolumn, .rightcolumn {   
+        width: 100%;
+        padding: 0;
+    }
+    }
 
+    /* Responsive layout - when the screen is less than 400px wide, make the navigation links stack on top of each other instead of next to each other */
+    @media screen and (max-width: 400px) {
+    .topnav a {
+        float: none;
+        width: 100%;
+    }
+    }
+    </style>
+    <script src='../content/home.js'></script>
+</head>
+<body>
 
-            /* The actual line being placed before each list item, tweak width and color as appropriate */
-            li:before {
-                background-color: #fff;
-                width: 2px;
-                content: '';
-                position: absolute;
-                top: 0px;
-                bottom: 0px;
-                left: 145px;
-            }
-                
-            /* Start the line further down on the first list item */
-            li:first-child:before { top: 200px;  }
+    <div class="header">
+    <h1>Welcome to MASHYPass</h1>
+    <p>A lightweight password manager built for everyday users.</p>
+    </div>
 
-            /* Stop the line short on the final list item */
-            li:last-child:before { height: 6px; }
-                
-            /* Styles for the SVG bullet points */
-            .bullet { margin-left: -20px; width: 12px; fill: #fff; float: left; padding-right: 10px; }
-            .bullet.big { width: 16px; margin-left: -22px; padding-right: 8px }
+    <div class="topnav">
+        <a href="#">My Vault</a>
+        <a href="#">About MASHYPass</a>
+        <a href="#">Create an Account</a>
+        <a href="#">Download</a>
+        <a href="#" style="float:right">Logout</a>
+    </div>
 
-            a { color: #06e; }
-
-
-            /*
-            LIST ELEMENT STYLING
-            */
-            .img-container-left {
-                height: 200px;
-                width: 300px;
-                float: left;
-                
-            }
-
-            .img-container-right {
-                height: 200px;
-                width: 300px;
-                float: right;
-            }
-
-            .text-container-right {
-                height: 200px;
-                width: 650px;
-                float: right;
-                
-            }
-
-            .text-container-left {
-                height: 200px;
-                width: 650px;
-                float: left;
-            }
-
-            #lock {
-                margin-left: 50px;
-                height: 200px;
-                width: 200px;
-            }
-
-            h3 {
-                font-family: Arial, Helvetica, sans-serif;
-                font-size: 30px;
-                text-align: left;
-            }
-
-
-            .topcorner{
-               color:white;
-               font-size:17px;
-               position:absolute;
-               top:10px;
-               right:10px;
-            }
-            
-
-            p {
-                font-family: Arial, Helvetica, sans-serif;
-                font-size: 15px; 
-                text-align: left;
-            }
-
-
-        </style>
-
-
-
-
-
-
-    </head>
-
-    <body>
-
-
-       
-          <div class="topcorner">
-            Hello, <a id="email"> </a>
-          </div>
-
-
-
-        <div class="header">
-            <h1>What Is MASHYPass?</h1>
+    <div class="row">
+    <div class="leftcolumn">
+        <div class="card">
+        <h2>TITLE HEADING</h2>
+        <h5>Title description, Dec 7, 2017</h5>
+        <div class="fakeimg" style="height:200px;">Image</div>
+        <p>Some text..</p>
+        <p>Sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.</p>
         </div>
-
-        <div class="navbar">
-            <nav>
-                <a href="#">Home</a>
-                <a href="#">About</a>
-                <a href="#">Vault</a>
-                <a href="#">Team</a>
-                <a href="#">Logout</a>
-                <div class="animation start-home"></div>
-            </nav>
+        <div class="card">
+        <h2>TITLE HEADING</h2>
+        <h5>Title description, Sep 2, 2017</h5>
+        <div class="fakeimg" style="height:200px;">Image</div>
+        <p>Some text..</p>
+        <p>Sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.</p>
         </div>
-        
-        
-        <ul>
-            <li id="first-elem">
-              <div class="bullet big">
-                <svg aria-hidden="true" viewBox="0 0 32 32" focusable="false">
-                    <circle cx="16" cy="16" r="20">
-                    </circle>
-                </svg>
-              </div>
+    </div>
+    <div class="rightcolumn">
+        <div class="card">
+        <h2>About Me</h2>
+        <div class="fakeimg" style="height:100px;">Image</div>
+        <p>Some text about me in culpa qui officia deserunt mollit anim..</p>
+        </div>
+        <div class="card">
+        <h3>Popular Post</h3>
+        <div class="fakeimg"><p>Image</p></div>
+        <div class="fakeimg"><p>Image</p></div>
+        <div class="fakeimg"><p>Image</p></div>
+        </div>
+        <div class="card">
+        <h3>Follow Me</h3>
+        <p>Some text..</p>
+        </div>
+    </div>
+    </div>
 
-              <div class="img-container-left">
-                <img id="lock" src="../assets/pls.png">
-              </div>
+    <div class="footer">
+    <h2>Footer</h2>
+    </div>
 
-              <div class="text-container-right">
-                  <h3>Heading.</h3>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-                      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-                      Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
-                      nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in 
-                      reprehenderit in voluptate velit esse cillum dolore eu fugiat 
-                      nulla pariatur. Excepteur sint occaecat cupidatat non proident, 
-                      sunt in culpa qui officia deserunt mollit anim id est laborum.
-                </p>
-              </div>
-
-            </li>
-
-            <li>
-              <div class="bullet">
-                <svg aria-hidden="true" viewBox="0 0 32 32" focusable="false"><circle stroke="none" cx="16" cy="16" r="20"></circle></svg>
-              </div>
-
-              <div class="text-container-left">
-                <h3>Heading.</h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-                    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
-                    nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in 
-                    reprehenderit in voluptate velit esse cillum dolore eu fugiat 
-                    nulla pariatur. Excepteur sint occaecat cupidatat non proident, 
-                    sunt in culpa qui officia deserunt mollit anim id est laborum.
-                </p>
-              </div>
-              <div class="img-container-right">
-                <img id="lock" src="../assets/pls.png">
-              </div>
-            </li>
-
-        </ul>
-    </body>
-
+</body>
 </html>

@@ -26759,7 +26759,8 @@ function getSessionId(email){
         port.postMessage({type: 'save-cookies', email: email, session_id: resp.data})
     })
     .then(function() {
-        if (window.location.host === "chrome-extension://aofelgdcnljcjeejddhcknappobidfch") {
+        console.log(window.location.host);
+        if (document.getElementById('login-modal') == null) {
             window.location.replace("/html/login_successful.html");
         } else {
             document.getElementById('login-modal').style.display = 'none';
@@ -26769,7 +26770,7 @@ function getSessionId(email){
     })
     .catch(function(error) {
         console.log(error);
-        setTimeout(() => getSessionId(email), 500);
+        //setTimeout(() => getSessionId(email), 500);
     })
 }
 
