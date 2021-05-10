@@ -7,7 +7,6 @@ const axios = require('axios');
  });
 
   port2.onMessage.addListener(function(msg) {
-
     console.log("message recieved in login" + msg);
 });
 
@@ -26,16 +25,13 @@ function getSessionId(email){
         // //send session id and email to background.js so content.js can access it 
         console.log("sending cookies to background....");
         port2.postMessage({type: 'save-cookies', email: email, session_id: resp.data})
-       
-
     })
     .then(function() {
-        console.log(window.location.host);
         if (document.getElementById('login-modal') == null) {
             window.location.replace("/html/login_successful.html");
         } else {
             document.getElementById('login-modal').style.display = 'none';
-            document.getElementById('login-successful-modal').style.display = 'flex'; 
+            document.getElementById('login-successful-modal').style.display = 'flex';    
         }
         
     })
@@ -63,7 +59,6 @@ function loginUser(){
         let dbPassword = response.data;
         if (bcrypt.compareSync(password, dbPassword)) {
             console.log("Access Granted");
-            //display login success
             getSessionId(email);
         } else {
             console.log("Access Denied");

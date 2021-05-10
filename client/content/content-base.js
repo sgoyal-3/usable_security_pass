@@ -368,15 +368,25 @@ function sendCreds(username, password, url){
 * the user to login into their account or register for one
 */
 function displayLoginPage() {
+    console.log("here....");
+
     fetch(chrome.runtime.getURL('/html/login_modal.html')).then(r => r.text()).then(html => {
         document.body.insertAdjacentHTML('beforeend', html);
     })
     .then(() => {
+        console.log(document.getElementById("login"));
         document.getElementById("close").addEventListener('click', (e) => {
             e.preventDefault();
-            document.getElementById('login-modal').style.display = "none";
+            console.log("click event callback...");
+            loginModule.loginUser();
+            //document.getElementById('login-modal').style.display = "none";
         })
-        console.log(document.getElementById("login"));
+
+        document.getElementById('close-all-set').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('login-successful-modal').style.display = "none";
+        })
+        
         document.getElementById("login").addEventListener('click', (e) => {
             e.preventDefault();
             console.log("click event callback...");
