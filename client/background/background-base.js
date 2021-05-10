@@ -1,6 +1,8 @@
 
 var axios = require('axios');
 
+const autofillRequested = new Event('autofill-requested');
+
 function doInCurrentTab(tabCallback) {
     chrome.tabs.query(
         { currentWindow: true, active: true },
@@ -9,6 +11,95 @@ function doInCurrentTab(tabCallback) {
             tabCallback(tabArray[0]); 
         }
     );
+}
+
+
+/*
+* displayLoginNotif: Use a Chrome notification to remind a user
+* to login when they are on a site that requires them to enter a password
+*/
+function displayLoginNotif() {
+
+  var notifOptions = {
+    type: "basic",
+    title: "Login To MashyPass",
+    message: `Login to MashyPass to autofill your credentials, save your credentials
+to your vault and get help generating a secure password.`,
+    iconUrl: "assets/secure.png",
+    silent: true,
+    buttons: [
+      {
+        title: "Login To My Account"
+      },
+    ]
+  }
+
+  chrome.notifications.create('login-notif', notifOptions, () => {
+    console.log("launching login notif...");
+  });
+
+  chrome.notifications.onButtonClicked.addListener((notifId, buttonIdx) => {
+    console.log(notifId);
+    if (notifId === 'login-notif'){
+      chrome.tabs.create({
+        url: "chrome-extension://aofelgdcnljcjeejddhcknappobidfch/html/popup.html"
+      });
+    
+      chrome.notifications.clear('login-notif', () => {
+        console.log("login-notif is cleared");
+      })
+    }
+  });
+}
+
+
+/*
+* displayAddToVaultNotif: Prompt the user to see if they
+* would like to add credentials to vault
+*/
+function displayAddToVaultNotif(vaultEntry) {
+  var notifOptions = {
+    type: "basic",
+    title: "Add to Vault?",
+    message: `Would you like to add the credentials for ${vaultEntry.hostname} 
+to your MashyPass vault?.`,
+    iconUrl: "assets/secure.png",
+    silent: true,
+    buttons: [
+      {
+        title: "Maybe later"
+      },
+      {
+        title: "Add to vault"
+      }
+    ]
+  }
+
+  chrome.notifications.create('add-to-vault-notif', notifOptions, () => {
+    console.log("launching add to vault notif...");
+
+    chrome.notifications.onButtonClicked.addListener((notifId, buttonIdx) => {
+      if (notifId === 'add-to-vault-notif') {
+        if (buttonIdx == 1) {
+          axios.post(`https://mashypass-app.herokuapp.com/api/vault?session-id=${session_id}&email=${email}`, {
+              'url': `${vaultEntry.hostname}`,
+              'username' : `${vaultEntry.username}`,
+              'password' : `${vaultEntry.password}`
+          })
+          .then(function(response) {
+            console.log(response);
+          })
+          .catch(function(error) {
+            console.log(error);
+          })
+        } 
+        chrome.notifications.clear('add-to-vault-notif', () => {
+          console.log("cleared add-to-vault-notif");
+        })
+      }
+    })
+
+  })
 }
 
 
@@ -42,7 +133,6 @@ function displayReuseNotif(reuseStatistics) {
     console.log('launching reuse notification...');
     
     setTimeout(() => displayReuseNotif(reuseStatistics), 2.16e7); // Notify user every six hours
-
     chrome.notifications.onButtonClicked.addListener((notifId, buttonIdx) => {
       console.log(notifId);
       if (buttonIdx == 0) {
@@ -56,6 +146,47 @@ function displayReuseNotif(reuseStatistics) {
         console.log("this doesn't work I guess");
       }
     });
+  })
+}
+
+
+/*
+* displayAutofillNotif: Ask the user if they would like to autofill
+* credentials from their vault
+*/
+function displayAutofillNotif(vaultEntry){
+
+  var notifOptions = {
+    type: "basic",
+    title: "Autofill Credentials?",
+    message: `Would you like MashyPass to autofill your credentials for ${vaultEntry.hostname}.`,
+    iconUrl: "assets/secure.png",
+    silent: true,
+    buttons: [
+      {
+        title: "No, thanks"
+      },
+      {
+        title: "Yes, please"
+      }
+    ]
+  }
+
+  chrome.notifications.create('autofill-notif', notifOptions, () => {
+    console.log('launching autofill notif...');
+
+    chrome.notifications.onButtonClicked.addListener((notifId, buttonIdx) => {
+      if (notifId === 'autofill-notif') {
+        if (buttonIdx == 1) {
+          autofillRequested.data = vaultEntry;
+          window.dispatchEvent(autofillRequested);
+        }
+
+        chrome.notifications.clear('autofill-notif', () => {
+          console.log("Cleared autofill notif");
+        })
+      }
+    })
   })
 }
 
@@ -122,10 +253,13 @@ const event = new Event('saved-cookies');
           console.log('got dem cookies from login');
               port.postMessage({type:'send-cookies2', email:email, session_id:session_id});
           }, false);
+      
 
+      window.addEventListener('autofill-requested', function(e) {
+        port.postMessage({'type': 'yes-fill', 'data': e.data});
+      })
 
-
-
+      
       port.onMessage.addListener(function(msg) {
         // Listen for the event.
 
@@ -133,6 +267,18 @@ const event = new Event('saved-cookies');
 
           if (msg.type === 'show-reuse-alert') {
             displayReuseNotif(msg.data);
+          }
+
+          if (msg.type === 'show-login-notif') {
+            displayLoginNotif();
+          }
+
+          if (msg.type === 'show-autofill-notif') {
+            displayAutofillNotif(msg.data);
+          }
+
+          if (msg.type === 'show-add-to-vault-notif') {
+            displayAddToVaultNotif(msg.data);
           }
           
           if (msg.type === 'open-modal-request' && login_attempt == true) {

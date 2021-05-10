@@ -148,10 +148,11 @@ const event = new Event('build');
     if (msg.type === "show-vault"){
         console.log("Received message to open vault");
     }
-   
 
-
-
+    if (msg.type === 'yes-fill') {
+        usernameField.value = msg.data.username;
+        passwordField.value = msg.data.password;
+    }
  });
 
 
@@ -368,29 +369,7 @@ function sendCreds(username, password, url){
 * the user to login into their account or register for one
 */
 function displayLoginPage() {
-    console.log("here....");
-
-    fetch(chrome.runtime.getURL('/html/login_modal.html')).then(r => r.text()).then(html => {
-        document.body.insertAdjacentHTML('beforeend', html);
-    })
-    .then(() => {
-        console.log(document.getElementById("login"));
-        document.getElementById("close").addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('login-modal').style.display = "none";
-        })
-
-        document.getElementById('close-all-set').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('login-successful-modal').style.display = "none";
-        })
-        
-        document.getElementById("login-button").addEventListener('click', (e) => {
-            e.preventDefault();
-            console.log("click event callback...");
-            loginModule.loginUser();
-        })
-    })
+    port.postMessage({'type':'show-login-notif'});
 }
 
 
@@ -469,29 +448,15 @@ function displayPasswordGenButton() {
 */
 function displayAutofill(username, password) {
     console.log("in displayAutofill");
-    fetch(chrome.runtime.getURL('/html/autofill.html')).then(r => r.text()).then(html => {
-        document.body.insertAdjacentHTML('beforeend', html);
-    })
-    .then(() => {
-        document.querySelector('.bg-modal').style.display = "flex";
-    })
-    .then(() => {
-        document.querySelector('.close').addEventListener("click", function() {
-            document.querySelector('.bg-modal').style.display = "none";  
-        })
-        document.getElementById('noauto').addEventListener("click", function() {
-            document.querySelector('.bg-modal').style.display = "none";
-        })
-        document.getElementById('auto').addEventListener("click", function(e) {
-            e.preventDefault();
-            //zhu li, do the thing!
-            usernameField.value = username;
-            passwordField.value = password;
-            document.querySelector('.bg-modal').style.display = "none";  
-        })
+    port.postMessage({
+        'type': 'show-autofill-notif', 
+        'data' : {
+            'hostname' : window.location.hostname,
+            'username' : username,
+            'password': password
+        }
     })
 }
-
 
 
 /*
@@ -499,31 +464,17 @@ function displayAutofill(username, password) {
 * save their recently entered credentials to their vault
 */
 function displayModal(username, password) {
-    console.log("in display modal");
-    fetch(chrome.runtime.getURL('/html/modal.html')).then(r => r.text()).then(html => {
-        document.body.insertAdjacentHTML('beforeend', html);
-    })
-    .then(() => {
-        document.getElementById("modal-email").value = username;
-        document.getElementById("modal-password").value = password;
-        document.querySelector('.bg-modal').style.display = "flex";
+    let hostname = window.location.hostname;
+    var key = CryptoJS.enc.Utf8.parse('1234567890123456');
+    var encrypted = encrypt(password, key);
 
-    })
-    .then(() => {
-        document.querySelector('.close').addEventListener("click", function() {
-            document.querySelector('.bg-modal').style.display = "none";
-            port.postMessage("modalclosed");
-        })
-        document.getElementById('noadd').addEventListener("click", function() {
-            document.querySelector('.bg-modal').style.display = "none";
-            port.postMessage("modalclosed");
-        })
-        document.getElementById('add').addEventListener("click", function(e) {
-            e.preventDefault();
-            sendVaultCredentials(username, password);
-            document.querySelector('.bg-modal').style.display = "none";
-            port.postMessage("modalclosed");
-        })
+    port.postMessage({
+        'type': 'show-add-to-vault-notif',
+        'data': {
+            'hostname' : hostname,
+            'username' : username,
+            'password' : encrypted
+        }
     })
 }
 
