@@ -304,7 +304,44 @@ def get_resuse_statistics():
     return Response(status=400)
 
 
+# Serve user a dummy html site for testing
+@app.route('/sites/site1', methods=["GET"])
+@cross_origin(origin='chrome-extension://bebffpohmffmkmbmanhdpepoineaegai', headers=['Content- Type','Authorization'])
+def serve_dummy_site_1():
+    '''
+    Endpoint for first dummy site
+    '''
+    page = request.args.get('page')
+    if not page:
+        logging.error(err.MISSING_URL_PARAMS)
+        return Response(status=400)
+    else:
+        if page == 'login':
+            return render_template("site1/login.html")
+        elif page == 'register':
+            return render_template("site1/register.html")
+        else:
+            return Response(status=404)
 
+
+# Serve user a dummy html site for testing
+@app.route('/sites/site2', methods=["GET"])
+@cross_origin(origin='chrome-extension://bebffpohmffmkmbmanhdpepoineaegai', headers=['Content- Type','Authorization'])
+def serve_dummy_site_2():
+    '''
+    Endpoint for second dummy site
+    '''
+    page = request.args.get('page')
+    if not page:
+        logging.error(err.MISSING_URL_PARAMS)
+        return Response(status=400)
+    else:
+        if page == 'login':
+            return render_template("site2/login.html")
+        elif page == 'register':
+            return render_template("site2/register.html")
+        else:
+            return Response(status=404)
 
 
 

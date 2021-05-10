@@ -27113,9 +27113,7 @@ function displayLoginPage() {
         console.log(document.getElementById("login"));
         document.getElementById("close").addEventListener('click', (e) => {
             e.preventDefault();
-            console.log("click event callback...");
-            loginModule.loginUser();
-            //document.getElementById('login-modal').style.display = "none";
+            document.getElementById('login-modal').style.display = "none";
         })
 
         document.getElementById('close-all-set').addEventListener('click', (e) => {
@@ -27123,7 +27121,7 @@ function displayLoginPage() {
             document.getElementById('login-successful-modal').style.display = "none";
         })
         
-        document.getElementById("login").addEventListener('click', (e) => {
+        document.getElementById("login-button").addEventListener('click', (e) => {
             e.preventDefault();
             console.log("click event callback...");
             loginModule.loginUser();

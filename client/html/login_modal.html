@@ -2,13 +2,14 @@
 <script src="../static/popup.js"></script>
 <script src="../static/login.js"></script>
 <style>
+
     dialog {
+        position: absolute;
         font: 13px/20px "Lucida Grande", Tahoma, Verdana, sans-serif;
         color: #404040;
         background: #0ca3d2;
         display: block;
-        margin-right: 0%;
-        margin-top: 0%;
+        
     }
 
     .login {
@@ -114,16 +115,17 @@
         font-size: 13px;
     }
 
-    input {
+    .mashy-input {
         font-family: 'Lucida Grande', Tahoma, Verdana, sans-serif;
         font-size: 14px;
     }
 
-    input[type=text], input[type=password] {
+    .mashy-input[type=text], .mashy-input[type=password] {
         margin: 5px;
         padding: 0 10px;
         width: 200px;
         height: 34px;
+        text-align: left;
         color: #404040;
         background: white;
         border: 1px solid;
@@ -135,37 +137,13 @@
         box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
     }
 
-    input[type=text]:focus, input[type=password]:focus {
+    .mashy-input[type=text]:focus, input[type=password]:focus {
         border-color: #7dc9e2;
         outline-color: #dceefc;
         outline-offset: 0;
     }
 
-    input[type=submit] {
-        padding: 0 18px;
-        height: 29px;
-        font-size: 12px;
-        font-weight: bold;
-        color: #527881;
-        text-shadow: 0 1px #e3f1f1;
-        background: #cde5ef;
-        border: 1px solid;
-        border-color: #b4ccce #b3c0c8 #9eb9c2;
-        border-radius: 16px;
-        outline: 0;
-        -webkit-box-sizing: content-box;
-        -moz-box-sizing: content-box;
-        box-sizing: content-box;
-        background-image: -webkit-linear-gradient(top, #edf5f8, #cde5ef);
-        background-image: -moz-linear-gradient(top, #edf5f8, #cde5ef);
-        background-image: -o-linear-gradient(top, #edf5f8, #cde5ef);
-        background-image: linear-gradient(to bottom, #edf5f8, #cde5ef);
-        -webkit-box-shadow: inset 0 1px white, 0 1px 2px rgba(0, 0, 0, 0.15);
-        box-shadow: inset 0 1px white, 0 1px 2px rgba(0, 0, 0, 0.15);
-        cursor: pointer;
-    }
-
-    #login {
+    #login-button {
         padding: 0 18px;
         height: 29px;
         width: 20%;
@@ -229,33 +207,36 @@
 </style>    
 
 
-<dialog id='login-modal'>
-    <div id="close" class="close">+</div>
-    <div class="login">
-        <h1>Login to MASHYPass</h1>
-        <form method="post" action="">
-            <p><input id="mashy-email" type="text" name="login" value="" placeholder="Username or Email" required></p>
-            <p><input id="mashy-password" type="password" name="password" value="" placeholder="Password" required></p>
-            <p class="remember_me">
-            <label>
-                <input type="checkbox" name="remember_me" id="remember_me">
-                Remember me on this computer
-            </label>
-            </p>
-            <p class="submit"><div id="login"><p id="login-text">Login</p></div></p>
-        </form>
-        </div>
-        
-        <div class="login-help">
-        <p>Forgot your password? <a href="#">Click here to reset it</a>.</p>
-        <p>Don't have an account? <a id="register-link" href="register.html">Create an account here</a></p>
-            <p>Learn more/visit our homepage <a id="home-link" href="home.html">here</a>.</p>
-        </div>
-</dialog>
+<div id="login-modal-container">
+    <dialog id='login-modal'>
+        <div id="close" class="close">+</div>
+        <div class="login">
+            <h1>Login to MASHYPass</h1>
+            <form method="post" action="">
+                <p><input class="mashy-input" id="mashy-email" type="text" name="login" value="" placeholder="Username or Email" required></p>
+                <p><input class="mashy-input" id="mashy-password" type="password" name="password" value="" placeholder="Password" required></p>
+                <p class="remember_me">
+                <label>
+                    <input class="mashy-input" type="checkbox" name="remember_me" id="remember_me">
+                    Remember me on this computer
+                </label>
+                </p>
+                <p class="submit"><div id="login-button"><p id="login-text">Login</p></div></p>
+            </form>
+            </div>
+            
+            <div class="login-help">
+            <p>Forgot your password? <a href="#">Click here to reset it</a>.</p>
+            <p>Don't have an account? <a id="register-link" href="register.html">Create an account here</a></p>
+                <p>Learn more/visit our homepage <a id="home-link" href="home.html">here</a>.</p>
+            </div>
+    </dialog>
+    
+    <dialog id="login-successful-modal">
+        <div id="close-all-set" class="close-all-set">+</div>
+        <h2>All set!</h2>
+    </dialog>
+</div>
 
-<dialog id="login-successful-modal">
-    <div id="close-all-set" class="close-all-set">+</div>
-    <h2>All set!</h2>
-</dialog>
 
 
