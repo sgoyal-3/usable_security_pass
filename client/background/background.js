@@ -1,410 +1,6 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],2:[function(require,module,exports){
-
-var axios = require('axios');
-
-function doInCurrentTab(tabCallback) {
-    chrome.tabs.query(
-        { currentWindow: true, active: true },
-        function (tabArray) {
-            console.log(tabArray); 
-            tabCallback(tabArray[0]); 
-        }
-    );
-}
-
-
-/*
-* Use a Chrome notification to display password reuse statistics
-* to the user
-*/
-function displayReuseNotif(reuseStatistics) {
-  let numReused = `${reuseStatistics.num_reused}`;
-  let numSites = `${reuseStatistics.num_sites}`;
-
-
-  var notifOptions = {
-    type: "basic",
-    title: "Security Alert",
-    message: `MashyPass has detected ${numReused} reused password(s) across ${numSites} accounts. 
-We highly recommend that you change these passwords.`,
-    iconUrl: "assets/secure.png",
-    silent: true,
-    buttons: [
-      {
-        title: "Change Passwords"
-      },
-      {
-        title: "More Information"
-      }
-    ]
-  }
-
-  chrome.notifications.create("password-reuse-notif", notifOptions, () => {
-    console.log('launching reuse notification...');
-    
-    setTimeout(() => displayReuseNotif(reuseStatistics), 2.16e7); // Notify user every six hours
-
-    chrome.notifications.onButtonClicked.addListener((notifId, buttonIdx) => {
-      console.log(notifId);
-      if (buttonIdx == 0) {
-        console.log('left button was clicked');
-        chrome.tabs.create({
-          url: "chrome-extension://aofelgdcnljcjeejddhcknappobidfch/html/vault.html"
-        })
-      } else if (buttonIdx == 1) {
-        console.log('right button was clicked');
-      } else {
-        console.log("this doesn't work I guess");
-      }
-    });
-  })
-}
-
-
-let modalOpened = false;
-
-/*
-This will allow us to detect a change in the url of the active tab
-This will be useful for detecting that the tab reloaded after 
-a successful log in so we can make sure to refresh the modal popup
-on the new page
-*/
-chrome.tabs.query({active: true, currentWindow: true},function(tabs) {
-   // chrome.tabs.sendMessage(tabs[0].id, {message: "hi"}, function(response) {
-   //      console.log(response);
-   //  });
-   chrome.extension.onConnect.addListener(function(port) {
-      console.log("Connected .....");
-      port.postMessage("tabUrlChange")
-    })
-}); 
-
-
-let openmodal_request = false;
-let login_attempt = false;
-var username = "";
-var password = "";
-var old_url = "";
-var new_url = "";
-var registration_point = "";
-
-var email = "";
-var session_id = "";
-
-
-
-//from https://stackoverflow.com/questions/8498592/extract-hostname-name-from-string
-function url_domain(data) {
-  var    a      = document.createElement('a');
-         a.href = data;
-  return a.hostname;
-}
-
-
-
-//communication with content.js 
- chrome.extension.onConnect.addListener(function(port) {
-      console.log("Connected .....");
-      if(openmodal_request){
-        port.postMessage({username : username, password: password});
-        openmodal_request = false;
-      }
-
-      port.onMessage.addListener(function(msg) {
-          console.log(msg);
-
-          if (msg.type === 'show-reuse-alert') {
-            displayReuseNotif(msg.data);
-          }
-          
-          if (msg.type === 'open-modal-request' && login_attempt == true) {
-            console.log("sending openModal message...");
-            port.postMessage({'type': 'openModal', 'username' : username, 'password' : password});
-          }
-          
-          
-          if (msg.type === 'save-cookies') {
-            email = msg.email;
-            session_id = msg.session_id;
-            console.log(email);
-            console.log(session_id);
-          }
-
-          if (typeof(msg.username) != 'undefined'){
-            /* 
-            save credentials and url of log in page
-            when content sends them
-            */
-            console.log('received login credentials');
-            username = msg.username;
-            password = msg.password;
-            old_url = msg.url;
-            login_attempt = true;
-            console.log(username);
-            console.log(password);
-            //port.postMessage({'type': 'openModal', 'username': username, 'password':password});
-
-          }
-          else if (msg == "modalclosed") {
-              /*once the modal has been closed by the user, we should no
-              longer open it on pages of the same domain
-              */
-              login_attempt = false;
-          } 
-          else if(msg.type === 'send-cookies'){
-            port.postMessage({email:email, session_id:session_id});
-          }
-      });
- })
-
-
-/*
-This will allow us to detect a change in the url of the active tab
-This will be useful for detecting that the tab reloaded after 
-a successful log in so we can make sure to refresh the modal popup
-on the new page
-*/
-chrome.tabs.onUpdated.addListener((tabId, change, tab) => {
-    if (tab.active && change.url) {
-        console.log("you are here: "+ change.url);     
-        new_url = change.url; 
-
-
-        /*
-        only do this if a previous page was a login page 
-        and the user has not yet decided to either add or not 
-        add credentials to vault
-        */
-        if(login_attempt){
-              /*
-              compare new and old domains
-              if they are the same, set openmodal_request to true 
-              the next time the connection is refreshed (which happens really often)
-              a message containing the credentials and request to open modal with
-              creds filled in will be sent to content.js
-
-              old_url is only ever set to the url of a log in page (in above response logic),
-              so we will always be comparing the new domain to the last seen login page
-            
-              var old_url_domain = url_domain(old_url);
-              var new_url_domain = url_domain(new_url);
-              console.log(old_url_domain);
-              console.log(new_url_domain);
-            
-            if(old_url_domain == new_url_domain){
-              openmodal_request = true;
-            }
-
-            */
-
-            //actually just open it regardless of domain
-            openmodal_request = true;
-
-            // //precaution? might keep this, we'll see
-            // login_attempt = false;
-            
-        }     
-    }
-    
-});
-
-
-
-
-
-
-
-
-
-},{"axios":3}],3:[function(require,module,exports){
 module.exports = require('./lib/axios');
-},{"./lib/axios":5}],4:[function(require,module,exports){
+},{"./lib/axios":3}],2:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -585,7 +181,7 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-},{"../core/buildFullPath":11,"../core/createError":12,"./../core/settle":16,"./../helpers/buildURL":20,"./../helpers/cookies":22,"./../helpers/isURLSameOrigin":25,"./../helpers/parseHeaders":27,"./../utils":29}],5:[function(require,module,exports){
+},{"../core/buildFullPath":9,"../core/createError":10,"./../core/settle":14,"./../helpers/buildURL":18,"./../helpers/cookies":20,"./../helpers/isURLSameOrigin":23,"./../helpers/parseHeaders":25,"./../utils":27}],3:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -643,7 +239,7 @@ module.exports = axios;
 // Allow use of default import syntax in TypeScript
 module.exports.default = axios;
 
-},{"./cancel/Cancel":6,"./cancel/CancelToken":7,"./cancel/isCancel":8,"./core/Axios":9,"./core/mergeConfig":15,"./defaults":18,"./helpers/bind":19,"./helpers/isAxiosError":24,"./helpers/spread":28,"./utils":29}],6:[function(require,module,exports){
+},{"./cancel/Cancel":4,"./cancel/CancelToken":5,"./cancel/isCancel":6,"./core/Axios":7,"./core/mergeConfig":13,"./defaults":16,"./helpers/bind":17,"./helpers/isAxiosError":22,"./helpers/spread":26,"./utils":27}],4:[function(require,module,exports){
 'use strict';
 
 /**
@@ -664,7 +260,7 @@ Cancel.prototype.__CANCEL__ = true;
 
 module.exports = Cancel;
 
-},{}],7:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
 
 var Cancel = require('./Cancel');
@@ -723,14 +319,14 @@ CancelToken.source = function source() {
 
 module.exports = CancelToken;
 
-},{"./Cancel":6}],8:[function(require,module,exports){
+},{"./Cancel":4}],6:[function(require,module,exports){
 'use strict';
 
 module.exports = function isCancel(value) {
   return !!(value && value.__CANCEL__);
 };
 
-},{}],9:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -827,7 +423,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = Axios;
 
-},{"../helpers/buildURL":20,"./../utils":29,"./InterceptorManager":10,"./dispatchRequest":13,"./mergeConfig":15}],10:[function(require,module,exports){
+},{"../helpers/buildURL":18,"./../utils":27,"./InterceptorManager":8,"./dispatchRequest":11,"./mergeConfig":13}],8:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -881,7 +477,7 @@ InterceptorManager.prototype.forEach = function forEach(fn) {
 
 module.exports = InterceptorManager;
 
-},{"./../utils":29}],11:[function(require,module,exports){
+},{"./../utils":27}],9:[function(require,module,exports){
 'use strict';
 
 var isAbsoluteURL = require('../helpers/isAbsoluteURL');
@@ -903,7 +499,7 @@ module.exports = function buildFullPath(baseURL, requestedURL) {
   return requestedURL;
 };
 
-},{"../helpers/combineURLs":21,"../helpers/isAbsoluteURL":23}],12:[function(require,module,exports){
+},{"../helpers/combineURLs":19,"../helpers/isAbsoluteURL":21}],10:[function(require,module,exports){
 'use strict';
 
 var enhanceError = require('./enhanceError');
@@ -923,7 +519,7 @@ module.exports = function createError(message, config, code, request, response) 
   return enhanceError(error, config, code, request, response);
 };
 
-},{"./enhanceError":14}],13:[function(require,module,exports){
+},{"./enhanceError":12}],11:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -1004,7 +600,7 @@ module.exports = function dispatchRequest(config) {
   });
 };
 
-},{"../cancel/isCancel":8,"../defaults":18,"./../utils":29,"./transformData":17}],14:[function(require,module,exports){
+},{"../cancel/isCancel":6,"../defaults":16,"./../utils":27,"./transformData":15}],12:[function(require,module,exports){
 'use strict';
 
 /**
@@ -1048,7 +644,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
   return error;
 };
 
-},{}],15:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -1137,7 +733,7 @@ module.exports = function mergeConfig(config1, config2) {
   return config;
 };
 
-},{"../utils":29}],16:[function(require,module,exports){
+},{"../utils":27}],14:[function(require,module,exports){
 'use strict';
 
 var createError = require('./createError');
@@ -1164,7 +760,7 @@ module.exports = function settle(resolve, reject, response) {
   }
 };
 
-},{"./createError":12}],17:[function(require,module,exports){
+},{"./createError":10}],15:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -1186,7 +782,7 @@ module.exports = function transformData(data, headers, fns) {
   return data;
 };
 
-},{"./../utils":29}],18:[function(require,module,exports){
+},{"./../utils":27}],16:[function(require,module,exports){
 (function (process){(function (){
 'use strict';
 
@@ -1288,7 +884,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 module.exports = defaults;
 
 }).call(this)}).call(this,require('_process'))
-},{"./adapters/http":4,"./adapters/xhr":4,"./helpers/normalizeHeaderName":26,"./utils":29,"_process":1}],19:[function(require,module,exports){
+},{"./adapters/http":2,"./adapters/xhr":2,"./helpers/normalizeHeaderName":24,"./utils":27,"_process":29}],17:[function(require,module,exports){
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -1301,7 +897,7 @@ module.exports = function bind(fn, thisArg) {
   };
 };
 
-},{}],20:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -1373,7 +969,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
   return url;
 };
 
-},{"./../utils":29}],21:[function(require,module,exports){
+},{"./../utils":27}],19:[function(require,module,exports){
 'use strict';
 
 /**
@@ -1389,7 +985,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
     : baseURL;
 };
 
-},{}],22:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -1444,7 +1040,7 @@ module.exports = (
     })()
 );
 
-},{"./../utils":29}],23:[function(require,module,exports){
+},{"./../utils":27}],21:[function(require,module,exports){
 'use strict';
 
 /**
@@ -1460,7 +1056,7 @@ module.exports = function isAbsoluteURL(url) {
   return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
 };
 
-},{}],24:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 'use strict';
 
 /**
@@ -1473,7 +1069,7 @@ module.exports = function isAxiosError(payload) {
   return (typeof payload === 'object') && (payload.isAxiosError === true);
 };
 
-},{}],25:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -1543,7 +1139,7 @@ module.exports = (
     })()
 );
 
-},{"./../utils":29}],26:[function(require,module,exports){
+},{"./../utils":27}],24:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -1557,7 +1153,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
   });
 };
 
-},{"../utils":29}],27:[function(require,module,exports){
+},{"../utils":27}],25:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -1612,7 +1208,7 @@ module.exports = function parseHeaders(headers) {
   return parsed;
 };
 
-},{"./../utils":29}],28:[function(require,module,exports){
+},{"./../utils":27}],26:[function(require,module,exports){
 'use strict';
 
 /**
@@ -1641,7 +1237,7 @@ module.exports = function spread(callback) {
   };
 };
 
-},{}],29:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict';
 
 var bind = require('./helpers/bind');
@@ -1994,4 +1590,432 @@ module.exports = {
   stripBOM: stripBOM
 };
 
-},{"./helpers/bind":19}]},{},[2]);
+},{"./helpers/bind":17}],28:[function(require,module,exports){
+
+var axios = require('axios');
+
+function doInCurrentTab(tabCallback) {
+    chrome.tabs.query(
+        { currentWindow: true, active: true },
+        function (tabArray) {
+            console.log(tabArray); 
+            tabCallback(tabArray[0]); 
+        }
+    );
+}
+
+
+/*
+* Use a Chrome notification to display password reuse statistics
+* to the user
+*/
+function displayReuseNotif(reuseStatistics) {
+  let numReused = `${reuseStatistics.num_reused}`;
+  let numSites = `${reuseStatistics.num_sites}`;
+
+
+  var notifOptions = {
+    type: "basic",
+    title: "Security Alert",
+    message: `MashyPass has detected ${numReused} reused password(s) across ${numSites} accounts. 
+     We highly recommend that you change these passwords.`,
+    iconUrl: "assets/secure.png",
+    silent: true,
+    buttons: [
+      {
+        title: "Change Passwords"
+      },
+      {
+        title: "More Information"
+      }
+    ]
+  }
+
+  chrome.notifications.create("password-reuse-notif", notifOptions, () => {
+    console.log('launching reuse notification...');
+    
+    setTimeout(() => displayReuseNotif(reuseStatistics), 2.16e7); // Notify user every six hours
+
+    chrome.notifications.onButtonClicked.addListener((notifId, buttonIdx) => {
+      console.log(notifId);
+      if (buttonIdx == 0) {
+        console.log('left button was clicked');
+        chrome.tabs.create({
+          url: "chrome-extension://aofelgdcnljcjeejddhcknappobidfch/html/vault.html"
+        })
+      } else if (buttonIdx == 1) {
+        console.log('right button was clicked');
+      } else {
+        console.log("this doesn't work I guess");
+      }
+    });
+  })
+}
+
+
+let modalOpened = false;
+
+/*
+This will allow us to detect a change in the url of the active tab
+This will be useful for detecting that the tab reloaded after 
+a successful log in so we can make sure to refresh the modal popup
+on the new page
+*/
+chrome.tabs.query({active: true, currentWindow: true},function(tabs) {
+   // chrome.tabs.sendMessage(tabs[0].id, {message: "hi"}, function(response) {
+   //      console.log(response);
+   //  });
+   chrome.extension.onConnect.addListener(function(port) {
+      console.log("Connected .....");
+      port.postMessage("tabUrlChange")
+    })
+}); 
+
+
+let openmodal_request = false;
+let login_attempt = false;
+var username = "";
+var password = "";
+var old_url = "";
+var new_url = "";
+var registration_point = "";
+
+var email = "";
+var session_id = "";
+
+
+
+//from https://stackoverflow.com/questions/8498592/extract-hostname-name-from-string
+function url_domain(data) {
+  var    a      = document.createElement('a');
+         a.href = data;
+  return a.hostname;
+}
+
+/*
+ this is for the special case in which we have just saved
+ cookies upon user log in to Mashypass and now need
+ to signal content.js that the user is signed in and get
+ he cookies to it (ik this is weird, but it is the best
+ workaround i could think of, and the others were even worse)
+*/
+const event = new Event('saved-cookies');
+
+//communication with content.js 
+ chrome.extension.onConnect.addListener(function(port) {
+
+      console.log("Connected .....");
+      if(openmodal_request){
+        port.postMessage({type: 'openModal', username : username, password: password});
+        openmodal_request = false;
+      }
+
+      //this is only triggrd when log in gives background cookies to save
+      window.addEventListener('saved-cookies', function (e) { 
+          console.log('got dem cookies from login');
+              port.postMessage({type:'send-cookies2', email:email, session_id:session_id});
+          }, false);
+
+
+
+
+      port.onMessage.addListener(function(msg) {
+        // Listen for the event.
+
+          console.log(msg);
+
+          if (msg.type === 'show-reuse-alert') {
+            displayReuseNotif(msg.data);
+          }
+          
+          if (msg.type === 'open-modal-request' && login_attempt == true) {
+            console.log("sending openModal message...");
+            port.postMessage({type: 'openModal', 'username' : username, 'password' : password});
+          }
+          
+          
+          if (msg.type === 'save-cookies') {
+            email = msg.email;
+            session_id = msg.session_id;
+            console.log("saved cookies: ");
+            console.log(email);
+            console.log(session_id);
+            window.dispatchEvent(event);
+
+          }
+
+          if (typeof(msg.username) != 'undefined'){
+            /* 
+            save credentials and url of log in page
+            when content sends them
+            */
+            console.log('received login credentials');
+            username = msg.username;
+            password = msg.password;
+            old_url = msg.url;
+            login_attempt = true;
+            console.log(username);
+            console.log(password);
+            console.log(login_attempt);
+            port.postMessage({'type': 'openModal', 'username': username, 'password':password});
+
+          }
+          else if (msg == "modalclosed") {
+              /*once the modal has been closed by the user, we should no
+              longer open it on pages of the same domain
+              */
+              login_attempt = false;
+          } 
+          else if(msg.type == 'send-cookies1'){
+            port.postMessage({type:'send-cookies1', email:email, session_id:session_id});
+          }
+          
+      });
+ })
+
+
+/*
+This will allow us to detect a change in the url of the active tab
+This will be useful for detecting that the tab reloaded after 
+a successful log in so we can make sure to refresh the modal popup
+on the new page
+*/
+chrome.tabs.onUpdated.addListener((tabId, change, tab) => {
+    if (tab.active && change.url) {
+        console.log("you are here: "+ change.url);     
+        new_url = change.url; 
+
+
+        /*
+        only do this if a previous page was a login page 
+        and the user has not yet decided to either add or not 
+        add credentials to vault
+        */
+        if(login_attempt){
+              /*
+              compare new and old domains
+              if they are the same, set openmodal_request to true 
+              the next time the connection is refreshed (which happens really often)
+              a message containing the credentials and request to open modal with
+              creds filled in will be sent to content.js
+
+              old_url is only ever set to the url of a log in page (in above response logic),
+              so we will always be comparing the new domain to the last seen login page
+            
+              var old_url_domain = url_domain(old_url);
+              var new_url_domain = url_domain(new_url);
+              console.log(old_url_domain);
+              console.log(new_url_domain);
+            
+            if(old_url_domain == new_url_domain){
+              openmodal_request = true;
+            }
+
+            */
+
+            //actually just open it regardless of domain
+            openmodal_request = true;
+
+            // //precaution? might keep this, we'll see
+            // login_attempt = false;
+            
+        }     
+    }
+    
+});
+
+
+
+
+
+
+
+
+
+},{"axios":1}],29:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}]},{},[28]);

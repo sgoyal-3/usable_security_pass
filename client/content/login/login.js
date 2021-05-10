@@ -2,9 +2,14 @@ var bcrypt = require('bcryptjs');
 const axios = require('axios');
 
  //establish communication connection with background.js
- var port = chrome.extension.connect({
-      name: "Sample Communication"
+ var port2 = chrome.extension.connect({
+      name: "login comms"
  });
+
+  port2.onMessage.addListener(function(msg) {
+
+    console.log("message recieved in login" + msg);
+});
 
 
  /*
@@ -18,9 +23,11 @@ function getSessionId(email){
         console.log(resp);
         document.cookie = `session-id=${resp.data}; path=/`;
         document.cookie = `email=${email}; path=/`;
-        //send session id and email to background.js so content.js can access it 
+        // //send session id and email to background.js so content.js can access it 
         console.log("sending cookies to background....");
-        port.postMessage({type: 'save-cookies', email: email, session_id: resp.data})
+        port2.postMessage({type: 'save-cookies', email: email, session_id: resp.data})
+       
+
     })
     .then(function() {
         console.log(window.location.host);

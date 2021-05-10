@@ -3,7 +3,7 @@
     "name": "MASHYPass",
     "version": "1.0.0",
     "content_scripts": [{
-      "matches": ["*://*.stackoverflow.com/*"],
+      "matches": ["*://*/*"],
       "js": ["content/content.js"]
     }],
     "permissions": [
@@ -20,10 +20,10 @@
     },
     "externally_connectable" : {
       "ids" : ["bebffpohmffmkmbmanhdpepoineaegai"],
-      "matches" : ["*://*.stackoverflow.com/*"],
+      "matches" : ["*://*/*"],
       "accepts_tls_channel_id" : false
     },
     "web_accessible_resources":["content/script.mjs", "html/popup.html", 
       "html/modal.html", "html/password_gen.html", "content/popup.js", "content/register.js", "static/login.js",
-    "assets/secure.png", "html/login_modal.html", "html/password_reuse.html"]
+    "assets/secure.png", "html/login_modal.html", "html/password_reuse.html", "html/autofill.html"]
   }

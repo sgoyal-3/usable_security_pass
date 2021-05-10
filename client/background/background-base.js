@@ -25,7 +25,7 @@ function displayReuseNotif(reuseStatistics) {
     type: "basic",
     title: "Security Alert",
     message: `MashyPass has detected ${numReused} reused password(s) across ${numSites} accounts. 
-We highly recommend that you change these passwords.`,
+     We highly recommend that you change these passwords.`,
     iconUrl: "assets/secure.png",
     silent: true,
     buttons: [
@@ -99,17 +99,36 @@ function url_domain(data) {
   return a.hostname;
 }
 
-
+/*
+ this is for the special case in which we have just saved
+ cookies upon user log in to Mashypass and now need
+ to signal content.js that the user is signed in and get
+ he cookies to it (ik this is weird, but it is the best
+ workaround i could think of, and the others were even worse)
+*/
+const event = new Event('saved-cookies');
 
 //communication with content.js 
  chrome.extension.onConnect.addListener(function(port) {
+
       console.log("Connected .....");
       if(openmodal_request){
-        port.postMessage({username : username, password: password});
+        port.postMessage({type: 'openModal', username : username, password: password});
         openmodal_request = false;
       }
 
+      //this is only triggrd when log in gives background cookies to save
+      window.addEventListener('saved-cookies', function (e) { 
+          console.log('got dem cookies from login');
+              port.postMessage({type:'send-cookies2', email:email, session_id:session_id});
+          }, false);
+
+
+
+
       port.onMessage.addListener(function(msg) {
+        // Listen for the event.
+
           console.log(msg);
 
           if (msg.type === 'show-reuse-alert') {
@@ -118,15 +137,18 @@ function url_domain(data) {
           
           if (msg.type === 'open-modal-request' && login_attempt == true) {
             console.log("sending openModal message...");
-            port.postMessage({'type': 'openModal', 'username' : username, 'password' : password});
+            port.postMessage({type: 'openModal', 'username' : username, 'password' : password});
           }
           
           
           if (msg.type === 'save-cookies') {
             email = msg.email;
             session_id = msg.session_id;
+            console.log("saved cookies: ");
             console.log(email);
             console.log(session_id);
+            window.dispatchEvent(event);
+
           }
 
           if (typeof(msg.username) != 'undefined'){
@@ -142,7 +164,7 @@ function url_domain(data) {
             console.log(username);
             console.log(password);
             console.log(login_attempt);
-            //port.postMessage({'type': 'openModal', 'username': username, 'password':password});
+            port.postMessage({'type': 'openModal', 'username': username, 'password':password});
 
           }
           else if (msg == "modalclosed") {
@@ -151,9 +173,10 @@ function url_domain(data) {
               */
               login_attempt = false;
           } 
-          else if(msg.type === 'send-cookies'){
-            port.postMessage({email:email, session_id:session_id});
+          else if(msg.type == 'send-cookies1'){
+            port.postMessage({type:'send-cookies1', email:email, session_id:session_id});
           }
+          
       });
  })
 
