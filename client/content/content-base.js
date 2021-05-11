@@ -169,8 +169,9 @@ const event = new Event('build');
 */
 window.addEventListener("load", () => {
     port.postMessage({type:'open-modal-request'});
+    console.log(window.location);
 
-    if (onLoginPage() || onRegistrationPage()){
+    if (onLoginPageTest() || onRegistrationPageTest()){
       port.postMessage({type:'send-cookies1'});  
     }  
 });
@@ -193,14 +194,15 @@ window.addEventListener('build', function (e) {
 * the filter in manifest.json once we have confirmed user is logged in
 */
 function main(){
+    console.log(window.location.url);
 
-    if (onLoginPage()){
+    if (onLoginPageTest()){
         console.log("On a login page")
         //initiate logic for login page (autofill and stuff)
         loginPageLogic();
     }
 
-    if (onRegistrationPage()){
+    if (onRegistrationPageTest()){
         console.log("On a registration page")
         displayPasswordGenButton();
         modifyPageContent();
@@ -289,8 +291,7 @@ function getUserSession() {
     if (email == "" && sessionId == ""){
         console.log("give up");
         displayLoginPage();
-    }
-    else{
+    } else {
          axios.get(`https://mashypass-app.herokuapp.com/api/session?email=${email}&session-id=${sessionId}`)
         .then(function(response) {
             console.log(response); // User is logged in, nothing else to do
@@ -299,7 +300,7 @@ function getUserSession() {
             main();
         })
         .catch(function(error) {
-            console.log(error.response.data);
+            console.log(error);
             displayLoginPage();
         })
     } 
@@ -654,7 +655,31 @@ function onLoginPage() {
 }
 
 
+/*
+* onLoginPageTest: Function to check if we are on a login page when we test beta
+* version
+*/
+function onLoginPageTest() {
+    return (window.location.href === "https://mashypass-app.herokuapp.com/sites/site1?page=login" ||
+            window.location.href === "https://mashypass-app.herokuapp.com/sites/site2?page=login");
+}
 
+
+/*
+* onRegistrationPageTest: Function to check if we are on a registration page for beta testing
+*/
+function onRegistrationPageTest() {
+    return (window.location.href === "https://mashypass-app.herokuapp.com/sites/site1?page=register" ||
+            window.location.href === "https://mashypass-app.herokuapp.com/sites/site2?page=register");
+}
+
+
+/*
+* onChangePasswordPageTest: Check if user is on beta testing change password page
+*/
+function onChangePasswordPageTest() {
+    return (window.location.href === "https://mashypass-app.herokuapp.com/sites/site2?page=change-password");
+}
 
 
 /*
