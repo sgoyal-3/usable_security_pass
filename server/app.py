@@ -340,6 +340,8 @@ def serve_dummy_site_2():
             return render_template("site2/login.html")
         elif page == 'register':
             return render_template("site2/register.html")
+        elif page == 'change-password':
+            return render_template("site2/change_password.html")
         else:
             return Response(status=404)
 
