@@ -1601,96 +1601,84 @@ function getCookie(name) {
     
 
 /*
-* getUserSession: check if user has correct session-id: If not, query the backend
-* for a new session-id
+* logged in to see vault?
 */
-function getUserSession() {
-    console.log("In getUserSession")
-    // Check if user is logged in
-    email = getCookie("email");
-    sessionId = getCookie("session-id");
-    //if email="" and sessionId="" that means def not logged on, axios req would fail so we should just exit now
-    if (email == "" && sessionId == ""){
-        console.log("User def not loggeed in");
-        //def not logged in, don't change anyhing
-    } else {  
-         axios.get(`https://mashypass-app.herokuapp.com/api/session?email=${email}&session-id=${sessionId}`)
+function loggedInVault(){
+    if (document.cookie == "") {
+        console.log("no cookies set");
+        window.location.href = '/html/popup.html';
+    } else {
+        // If cookies are set, check with server to see if session is expired
+        console.log("cookies set");
+        var email = getCookie("email");
+        var session_id = getCookie("session-id");
+        axios.get(`https://mashypass-app.herokuapp.com/api/session?email=${email}&session-id=${session_id}`)
         .then(function(response) {
-            console.log(response); // User is logged in, nothing else to do
-            console.log("User already logged in, exiting function...");
-            window.location.replace("/html/login_successful.html");
+            console.log(response);
+            window.location.href = '/html/vault.html';
         })
         .catch(function(error) {
-            console.log(error);
+            console.log(error.response.data);
+            window.location.href = '/html/popup.html';
         })
-    } 
+    }
+}
+
+function loggedInGeneral(){
+    if (document.cookie == "") {
+        console.log("no cookies set");
+        
+    } else {
+        // If cookies are set, check with server to see if session is expired
+        console.log("cookies set");
+        var email = getCookie("email");
+        var session_id = getCookie("session-id");
+        axios.get(`https://mashypass-app.herokuapp.com/api/session?email=${email}&session-id=${session_id}`)
+        .then(function(response) {
+            console.log(response);
+
+
+            //add log out button
+            var innerstring = "<a>Hello, ";
+            var full = innerstring.concat(getCookie("email").split("@")[0]).concat('</a>');
+            console.log(full);
+            document.getElementById("1").innerHTML = full;
+
+            document.getElementById("2").innerHTML = '<a href="">Log out</a>';
+
+            var button = document.createElement("button");
+            button.className = "main-button";
+            button.id = "vault-button";
+            button.innerHTML = "My Vault";
+            var element = document.getElementById("nav");
+            console.log(element)
+            element.appendChild(button);
+
+            document.getElementById("vault-button").addEventListener("click", function() {
+              loggedInVault(); 
+            });
+
+
+            //"<button id="vault-button" class="main-button">My Vault</button>"
+
+
+            //replace ccreate acccount with logout
+            // var element = document.getElementById("logout");
+            // element.innerHTML = '<a href="">Log out</a>';
+        })
+        .catch(function(error) {
+            console.log(error.response.data);
+            
+        })
+    }
 }
 
 
-
-//establish communication connection with background.js
- var port = chrome.extension.connect({
-      name: "Sample Communication"
- });
-
-// if session saved, redirect to login_succsesful page
 window.addEventListener('load', function() {
-
-    // if(document.cookie == ""){
-    //     console.log("no cookies set");
-    // } else {
-    //     // If cookies are set, check with server to see if session is expired
-    //     console.log("cookies set");
-    //     //var email = getCookie("email");
-    //     //var session_id = getCookie("session-id");
-    //     var email = "";
-    //     var session_id = "";
-    //     axios.get(`https://mashypass-app.herokuapp.com/api/session?email=${email}&session-id=${session_id}`)
-    //     .then(function(response) {
-    //         port.postMessage({email: email, session_id: session_id}); // send cookies to background.js
-    //         window.location.replace("/html/login_successful.html");
-    //     })
-    //     .catch(function(error) {
-    //         console.log(error.response.data);
-    //     })
-    // }
-    getUserSession();
-
-        
-    
-})
-
-
-/*
-* Send the user to the register page if they click the "Create an Account link"
-*/
-window.addEventListener('load', function() {
-    let registerLink = document.getElementById("register-link");
-    registerLink.addEventListener('click', function() {
-        //redirect
-        chrome.tabs.create({url: "html/register.html"});
-    })
+    loggedInGeneral();
 
 
 })
-
-
-/*
-* Send the user to the home page if they click the home link
-*/
-window.addEventListener('load', function() {
-    let registerLink = document.getElementById("home-link");
-    registerLink.addEventListener('click', function() {
-        //redirect
-        chrome.tabs.create({url: "html/home.html"});
-    })
-
-
-})
-
-
-
-
 },{"axios":1}],29:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
