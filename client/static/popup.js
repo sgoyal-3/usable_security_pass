@@ -1605,7 +1605,7 @@ function getCookie(name) {
 * for a new session-id
 */
 function getUserSession() {
-    console.log("In getUserSession")
+    console.log("In getUserSession");
     // Check if user is logged in
     email = getCookie("email");
     sessionId = getCookie("session-id");

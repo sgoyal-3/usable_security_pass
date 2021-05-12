@@ -2974,6 +2974,12 @@ module.exports = {
 
 }).call(this)}).call(this,require('_process'),require("timers").setImmediate)
 },{"_process":178,"crypto":100,"timers":215}],29:[function(require,module,exports){
+/*
+The only difference between this and login.js is that this is only loaded by login_full.html,
+which is the login page that is redirected to from the home page. This js redirects back to 
+the home page instead of the login_successful.thml page. 
+*/
+
 var bcrypt = require('bcryptjs');
 const axios = require('axios');
 
@@ -3003,12 +3009,9 @@ function getSessionId(email){
         port2.postMessage({type: 'save-cookies', email: email, session_id: resp.data})
     })
     .then(function() {
-        if (document.getElementById('login-modal') == null) {
-            window.location.replace("/html/login_successful.html");
-        } else {
-            document.getElementById('login-modal').style.display = 'none';
-            document.getElementById('login-successful-modal').style.display = 'flex';    
-        }
+       
+        window.location.replace("/html/home.html");
+        
         
     })
     .catch(function(error) {
