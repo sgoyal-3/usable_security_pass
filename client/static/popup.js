@@ -208,10 +208,10 @@ window.addEventListener('load', function() {
     } else {
         // If cookies are set, check with server to see if session is expired
         console.log("cookies set");
-        //var email = getCookie("email");
-        //var session_id = getCookie("session-id");
-        var email = "";
-        var session_id = "";
+        var email = getCookie("email");
+        var session_id = getCookie("session-id");
+        //var email = "";
+        //var session_id = "";
         axios.get(`https://mashypass-app.herokuapp.com/api/session?email=${email}&session-id=${session_id}`)
         .then(function(response) {
             port.postMessage({email: email, session_id: session_id}); // send cookies to background.js
