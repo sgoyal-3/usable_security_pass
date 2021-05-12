@@ -5,7 +5,11 @@ function getCookie(name) {
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop().split(';').shift();
 }
-    
+
+//establish communication connection with background.js
+var port = chrome.extension.connect({
+    name: "Sample Communication"
+});
 
 /*
 * getUserSession: check if user has correct session-id: If not, query the backend
@@ -14,8 +18,8 @@ function getCookie(name) {
 function getUserSession() {
     console.log("In getUserSession")
     // Check if user is logged in
-    email = getCookie("email");
-    sessionId = getCookie("session-id");
+    let email = getCookie("email");
+    let sessionId = getCookie("session-id");
     //if email="" and sessionId="" that means def not logged on, axios req would fail so we should just exit now
     if (email == "" && sessionId == ""){
         console.log("User def not loggeed in");
@@ -24,6 +28,7 @@ function getUserSession() {
          axios.get(`https://mashypass-app.herokuapp.com/api/session?email=${email}&session-id=${sessionId}`)
         .then(function(response) {
             console.log(response); // User is logged in, nothing else to do
+            port.postMessage({type: 'save-cookies', email: email, session_id: sessionId});
             console.log("User already logged in, exiting function...");
             window.location.replace("/html/login_successful.html");
         })
@@ -35,10 +40,7 @@ function getUserSession() {
 
 
 
-//establish communication connection with background.js
- var port = chrome.extension.connect({
-      name: "Sample Communication"
- });
+
 
 // if session saved, redirect to login_succsesful page
 window.addEventListener('load', function() {

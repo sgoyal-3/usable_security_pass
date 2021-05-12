@@ -224,31 +224,24 @@
                 visibility: visible;
             }
 
-            .feedback {
+            #mission-statement {
                 color: white;
+                display: block;
                 position: absolute;
+                position: fixed;
                 right: 10%;
-                top: 15%;
-                height: 300px;
-                width: 375px;
-                background-color: #404040;
-                opacity: 0.75;
                 text-align: center;
+                top: 100px;
+                left: 50%;
+                right: 5%;
+                font-size: 20px;
             }
-
-            .feedback h4 {
-                position: relative;
-                left: 2%;
-                top: 2%;
-                text-align: left;
-            } 
 
         </style>
     </head>
     <body>
         <div class="login">
-            <h1>Welcome to MASHYPass</h1>
-            <h4>Create Your Account Below!</h4>
+            <h1>Create an Account</h1>
             <form id="form" method="post" action="">
 
                 <div class="form-control">
@@ -287,13 +280,10 @@
               <p class="submit"><input id="submit" type="submit" name="commit" value="Create Account"></p>
             </form>
           </div>
-          <div id="feedback" class="feedback">
-            <h3>Password Feedback and Suggestions</h3>
-            <h4 id="password-display">Current password: </h4>
-            <h4 id="score">Score: 0/4</h4>
-            <h4 id="time-to-crack">Time to crack: </h4>
-            <h4 id="warning">Warning: </h4>
-            <h4 id="suggestions">Suggesstions: Add another word or two. Uncommon words are better</h4>
+          <div id="mission-statement">
+              <h1>Welcome to MashyPass</h1>
+              <img src="../assets/secure.png" alt="lock-icon" width="200" height="200">
+              <h4>A lightweight password manager built for everyday users.</h4>
           </div>
     </body>
 </html>

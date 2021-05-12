@@ -26886,8 +26886,8 @@ const event = new Event('build');
     }
 
     if (msg.type === 'yes-fill') {
-        usernameField.value = msg.data.username;
-        passwordField.value = msg.data.password;
+        document.getElementById("email").value = msg.data.username;
+        document.getElementById("password").value = msg.data.password;
     }
  });
 
@@ -27116,32 +27116,27 @@ function displayLoginPage() {
 */
 function displayPasswordGenButton() {
     let passwordInput = document.getElementById("password");
-    passwordInput.style.backgroundImage = null;
+    passwordInput.style.backgroundImage = "url(chrome-extension://aofelgdcnljcjeejddhcknappobidfch/assets/secure.png)";
+    passwordInput.style.backgroundRepeat = "no-repeat";
+    passwordInput.style.backgroundAttachment = "scroll";
+    passwordInput.style.backgroundSize = "16px 18px";
+    passwordInput.style.backgroundPosition = "98% 50%";
+    passwordInput.style.cursor = "pointer";
     fetch(chrome.runtime.getURL('/html/password_gen.html')).then(r => r.text()).then(html => {
         passwordInput.parentElement.insertAdjacentHTML('beforeend', html);
     })
     .then(() => {
-        window.addEventListener('click', ({ target }) => {
-            let clickInsidePopup = (target.id == 'dialog-box' || 
-                                    target.parentElement.id == 'dialog-box' ||
-                                    target.parentElement.parentElement.id == 'dialog-box');
-            if (!clickInsidePopup && target.id !== 'lock-icon-container' && target.id !== 'lock-icon') {
-                let dialogBox = document.getElementById('dialog-box');
-                dialogBox.style.display = "none";
-                dialogBox.value = "OFF";
-            }
-        })
 
-        document.getElementById("lock-icon-container").addEventListener("click", () => {
+        
 
+        document.getElementById("password").addEventListener("click", () => {
             let dialogBox = document.getElementById("dialog-box");
-            if (dialogBox.value === "ON") {
-                dialogBox.value = "OFF";
-                dialogBox.style.display = "none"; 
-            } else {
-                dialogBox.value = "ON";
-                dialogBox.style.display = "flex";
-            }
+            dialogBox.style.display = "flex";
+
+            document.getElementById("close").addEventListener("click", () => {
+                console.log("hello");
+                dialogBox.style.display = "none";
+            })
 
             passwordInput.addEventListener('input', () => {
                 fillInPasswordFeedback(passwordInput);
