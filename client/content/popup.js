@@ -16,7 +16,7 @@ var port = chrome.extension.connect({
 * for a new session-id
 */
 function getUserSession() {
-    console.log("In getUserSession")
+    console.log("In getUserSession");
     // Check if user is logged in
     let email = getCookie("email");
     let sessionId = getCookie("session-id");
@@ -45,24 +45,6 @@ function getUserSession() {
 // if session saved, redirect to login_succsesful page
 window.addEventListener('load', function() {
 
-    // if(document.cookie == ""){
-    //     console.log("no cookies set");
-    // } else {
-    //     // If cookies are set, check with server to see if session is expired
-    //     console.log("cookies set");
-    //     //var email = getCookie("email");
-    //     //var session_id = getCookie("session-id");
-    //     var email = "";
-    //     var session_id = "";
-    //     axios.get(`https://mashypass-app.herokuapp.com/api/session?email=${email}&session-id=${session_id}`)
-    //     .then(function(response) {
-    //         port.postMessage({email: email, session_id: session_id}); // send cookies to background.js
-    //         window.location.replace("/html/login_successful.html");
-    //     })
-    //     .catch(function(error) {
-    //         console.log(error.response.data);
-    //     })
-    // }
     getUserSession();
 
         

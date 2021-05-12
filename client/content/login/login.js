@@ -72,7 +72,7 @@ function loginUser(){
 
 
 window.addEventListener('load', function() {
-    let login = document.getElementById("login");
+    let login = document.getElementById("mashy-login");
     login.addEventListener('click', function(e) {
         e.preventDefault();
         loginUser();
