@@ -88,6 +88,7 @@ to your MashyPass vault?.`,
           })
           .then(function(response) {
             console.log(response);
+            getReuseStatistics();
           })
           .catch(function(error) {
             console.log(error);
@@ -187,6 +188,21 @@ function displayAutofillNotif(vaultEntry){
         })
       }
     })
+  })
+}
+
+
+/*
+* getReuseStatistics: Get user's password reuse statistics from backend
+*/
+function getReuseStatistics(userEmail, userSessionId) {
+  axios.get(`https://mashypass-app.herokuapp.com/api/analytics/vault/reuse?email=${email}&session-id=${session_id}`)
+  .then(function(response) {
+      console.log(response);
+      displayReuseNotif(response.data);
+  })
+  .catch(function(error) {
+      console.log(error.response.data);
   })
 }
 

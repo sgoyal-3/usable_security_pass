@@ -27069,22 +27069,6 @@ function sendVaultCredentials(username, password) {
 }
 
 
-/*
-* getReuseStatistics: Get user's password reuse statistics from backend
-*/
-function getReuseStatistics(userEmail, userSessionId) {
-    axios.get(`https://mashypass-app.herokuapp.com/api/analytics/vault/reuse?email=${userEmail}&session-id=${userSessionId}`)
-    .then(function(response) {
-        console.log(response);
-        displayReuseStatistics(response.data);
-        //setTimeout(() => {getReuseStatistics(userEmail, sessionId)}, 60000);
-    })
-    .catch(function(error) {
-        console.log(error.response.data);
-    })
-}
-
-
 //sends credentials and info to background.js
 function sendCreds(username, password, url){
     console.log("hi im sendCreds");
