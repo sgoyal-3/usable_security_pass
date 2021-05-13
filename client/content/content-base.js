@@ -171,7 +171,7 @@ window.addEventListener("load", () => {
     port.postMessage({type:'open-modal-request'});
     console.log(window.location);
 
-    if (onLoginPageTest() || onRegistrationPageTest()){
+    if (onLoginPageTest() || onRegistrationPageTest() || onChangePasswordPageTest()){
       port.postMessage({type:'send-cookies1'});  
     }  
 });
@@ -194,7 +194,7 @@ window.addEventListener('build', function (e) {
 * the filter in manifest.json once we have confirmed user is logged in
 */
 function main(){
-    console.log(window.location.url);
+    console.log(window.location.href);
 
     if (onLoginPageTest()){
         console.log("On a login page")
@@ -538,16 +538,18 @@ function changePasswordPageLogic(){
         let url = href.substring(0, href.indexOf('?'));
         var usernameContents = document.getElementById("email").value;
         var passwordContents = document.getElementById("password").value;
+        var key = CryptoJS.enc.Utf8.parse('1234567890123456');
+        var encrypted = encrypt(passwordContents, key);
         axios.put(`https://mashypass-app.herokuapp.com/api/vault?email=${email}&url=${url}&session-id=${sessionId}`, {
             "url": url,
             "username": usernameContents,
-            "password": passwordContents
+            "password": encrypted
         })
         .then(function(response) {
             console.log(response);
         })
         .catch(function(error) {
-            console.log(error);
+            console.log(error.response.data);
         })
     })
 }

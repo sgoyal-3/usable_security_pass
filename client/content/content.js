@@ -26907,7 +26907,7 @@ window.addEventListener("load", () => {
     port.postMessage({type:'open-modal-request'});
     console.log(window.location);
 
-    if (onLoginPageTest() || onRegistrationPageTest()){
+    if (onLoginPageTest() || onRegistrationPageTest() || onChangePasswordPageTest()){
       port.postMessage({type:'send-cookies1'});  
     }  
 });
@@ -26930,7 +26930,7 @@ window.addEventListener('build', function (e) {
 * the filter in manifest.json once we have confirmed user is logged in
 */
 function main(){
-    console.log(window.location.url);
+    console.log(window.location.href);
 
     if (onLoginPageTest()){
         console.log("On a login page")
@@ -26943,6 +26943,14 @@ function main(){
         displayPasswordGenButton();
         modifyPageContent();
     }
+
+    if (onChangePasswordPageTest()){
+        console.log("On a change password page");
+        displayPasswordGenButton();
+        changePasswordPageLogic();
+    }
+
+
 }
 
 
@@ -26977,19 +26985,6 @@ function loginPageLogic(){
         if(error.response.data == comp){
             //no creds for this url yet, can't autofill, get ready to add to vault  
             console.log("putting listener on login-form");
-
-             /*
-            TODO: find a way for it detect when form is submitted via enter
-            key as well as click, but it doesn't seem to work
-            */
-            // var submit = document.getElementById("login-form");
-            // submit.addEventListener("submit", function() 
-            // {   
-            //     console.log("submitted");
-            //     var username_contents = document.getElementById("email").value;
-            //     var password_contents = document.getElementById("password").value;
-            //     sendCreds(username_contents, password_contents, window.location.href); 
-            // });
 
             var submit = document.getElementById("submit-button");
             submit.addEventListener("click", function() 
@@ -27041,7 +27036,6 @@ function getUserSession() {
         })
     } 
 }
-
 
 
 /*
@@ -27184,7 +27178,8 @@ function displayAutofill(username, password) {
 * save their recently entered credentials to their vault
 */
 function displayModal(username, password) {
-    let hostname = window.location.href;
+    let href = window.location.href.toString();
+    let hostname = href.toString().substr(0, href.indexOf('?'));
     var key = CryptoJS.enc.Utf8.parse('1234567890123456');
     var encrypted = encrypt(password, key);
 
@@ -27266,6 +27261,36 @@ function modifyPageContent(){
         displayModal(usernameContents, passwordContents);
     });
 }
+
+
+/*
+* changePasswordPageLogic: Logic that will run on all change password pages
+*/
+function changePasswordPageLogic(){
+    var submit = document.getElementById('submit-button');
+    submit.addEventListener('click', (e) => {
+        e.preventDefault();
+        let href = window.location.href.toString();
+        let url = href.substring(0, href.indexOf('?'));
+        var usernameContents = document.getElementById("email").value;
+        var passwordContents = document.getElementById("password").value;
+        var key = CryptoJS.enc.Utf8.parse('1234567890123456');
+        var encrypted = encrypt(passwordContents, key);
+        axios.put(`https://mashypass-app.herokuapp.com/api/vault?email=${email}&url=${url}&session-id=${sessionId}`, {
+            "url": url,
+            "username": usernameContents,
+            "password": encrypted
+        })
+        .then(function(response) {
+            console.log(response);
+        })
+        .catch(function(error) {
+            console.log(error.response.data);
+        })
+    })
+}
+
+
 
 
 /*
@@ -27396,7 +27421,8 @@ function onRegistrationPageTest() {
 * onChangePasswordPageTest: Check if user is on beta testing change password page
 */
 function onChangePasswordPageTest() {
-    return (window.location.href === "https://mashypass-app.herokuapp.com/sites/site2?page=change-password");
+    return (window.location.href === "https://mashypass-app.herokuapp.com/sites/site2?page=change-password"
+            || window.location.href === "https://mashypass-app.herokuapp.com/sites/site1?page=change-password");
 }
 
 
