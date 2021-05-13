@@ -481,14 +481,10 @@ const event = new Event('saved-cookies');
             console.log(email);
             console.log(session_id);
             window.dispatchEvent(event);
-
           }
 
+          /*
           if (typeof(msg.username) != 'undefined'){
-            /* 
-            save credentials and url of log in page
-            when content sends them
-            */
             console.log('received login credentials');
             username = msg.username;
             password = msg.password;
@@ -499,14 +495,12 @@ const event = new Event('saved-cookies');
             console.log(login_attempt);
             port.postMessage({'type': 'openModal', 'username': username, 'password':password});
 
-          }
-          else if (msg == "modalclosed") {
-              /*once the modal has been closed by the user, we should no
-              longer open it on pages of the same domain
-              */
+          } else if (msg == "modalclosed") {
+      
               login_attempt = false;
           } 
-          else if(msg.type == 'send-cookies1'){
+          */
+          if(msg.type == 'send-cookies1'){
             port.postMessage({type:'send-cookies1', email:email, session_id:session_id});
           }
           

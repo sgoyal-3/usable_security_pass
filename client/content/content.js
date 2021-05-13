@@ -27200,7 +27200,7 @@ function displayAutofill(username, password) {
 * save their recently entered credentials to their vault
 */
 function displayModal(username, password) {
-    let hostname = window.location.hostname;
+    let hostname = window.location.href;
     var key = CryptoJS.enc.Utf8.parse('1234567890123456');
     var encrypted = encrypt(password, key);
 
@@ -27277,10 +27277,9 @@ function modifyPageContent(){
     {   
         e.preventDefault();    
         console.log("submitted");
-        var urlContents = window.location.hostname;
         var usernameContents = document.getElementById("email").value;
         var passwordContents = document.getElementById("password").value;
-        sendCreds(usernameContents, passwordContents, urlContents);
+        displayModal(usernameContents, passwordContents);
     });
 }
 

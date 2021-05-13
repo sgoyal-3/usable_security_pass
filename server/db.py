@@ -146,6 +146,11 @@ class DB:
         user = self.validate_user_session(email, session_id)
         
         user_vault = user.get('vault')
+        # Make sure user is not adding a duplicate vault entry
+        for vault_entry in user_vault:
+            if vault_entry['url'] == url and vault_entry['username'] == username:
+                return
+                
         user_vault.append({'url' : url, 'username' : username, 'password' : password})    
         self.client.users.update_one({'_id' : user.get('_id')}, 
         {'$set' : {'vault' : user_vault}})
