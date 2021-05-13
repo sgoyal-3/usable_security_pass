@@ -199,7 +199,10 @@ function getReuseStatistics(userEmail, userSessionId) {
   axios.get(`https://mashypass-app.herokuapp.com/api/analytics/vault/reuse?email=${email}&session-id=${session_id}`)
   .then(function(response) {
       console.log(response);
-      displayReuseNotif(response.data);
+      if (response.data.num_reused > 0) {
+        displayReuseNotif(response.data);
+      }
+      
   })
   .catch(function(error) {
       console.log(error.response.data);
