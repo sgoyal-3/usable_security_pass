@@ -27151,6 +27151,14 @@ function displayPasswordGenButton() {
                 fillInPasswordFeedback(passwordInput);
             })
 
+            document.getElementById("copy-password").addEventListener('click', () => {
+                navigator.clipboard.writeText(passwordInput.value)
+                .then(() => {console.log('success!')})
+                .catch((err) => console.log(err));
+            })
+
+
+
         })
     })
 }
