@@ -387,11 +387,15 @@ function displayPasswordGenButton() {
     passwordInput.style.backgroundPosition = "98% 50%";
     passwordInput.style.cursor = "pointer";
     fetch(chrome.runtime.getURL('/html/password_gen.html')).then(r => r.text()).then(html => {
-        passwordInput.parentElement.insertAdjacentHTML('beforeend', html);
+        console.log(window.location.href);
+        if (window.location.href === 'https://mashypass-app.herokuapp.com/sites/site1?page=register'){
+            document.getElementsByClassName("wrapper fadeInDown")[0].insertAdjacentHTML('beforeend', html);
+        } else {
+            document.getElementsByClassName("header")[0].insertAdjacentHTML('afterbegin', html);
+        }
+        
     })
     .then(() => {
-
-        
 
         document.getElementById("password").addEventListener("click", () => {
             let dialogBox = document.getElementById("dialog-box");
