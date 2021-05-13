@@ -170,29 +170,6 @@ function createDeleteButton(hostname) {
 }
 
 
-
-
-
-/*
-* showPassword
-*/
-function showPassword(index) {
-    let toggle = passwordToggles[index];
-    if (toggle == undefined) {
-        console.log("Why is this undefined");
-        return;
-    }
-    let passwordField = passwordFields[index];
-    if (toggle.value === "OFF") {
-        toggle.value = "ON";
-        passwordField.innerHTML = toggle.password;
-    } else {
-        toggle.value = "OFF";
-        passwordField.innerHTML = "*".repeat(passwordField.password.length);
-    }
-}
-
-
 /*
 *Driver code for vault page
 */
@@ -227,20 +204,23 @@ window.addEventListener('load', () => {
                     } 
                 } else if (event.target.nodeName === 'IMG') {
                     let deleteVerification = document.getElementById('delete-verification');
-                    deleteVerification.style.display = "flex";
+                    deleteVerification.style.display = "block";
+
+                    document.getElementById('close').addEventListener('click', () => {
+                        deleteVerification.style.display = "none";
+                    })
 
                     document.getElementById('yes-delete').addEventListener('click', () => {
                         let url = event.target.hostname;
                         axios.delete(`https://mashypass-app.herokuapp.com/api/vault?email=${userEmail}&url=${url}&session-id=${sessionId}`)
                         .then(function(response) {
                             console.log(response);
+                            window.location.href = "chrome-extension://aofelgdcnljcjeejddhcknappobidfch/html/vault.html";
                         })
                         .catch(function(error) {
                             console.log(error.response.data);
                         })
                     })
-
-
                 }
             })
         })

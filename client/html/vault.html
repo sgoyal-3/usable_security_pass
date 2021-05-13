@@ -134,28 +134,65 @@
           display: inline;
         }
 
-        .delete-button {
-          position: relative;
-          left: 60%;
+        .option-button {
+          padding: 0 18px;
+          height: 29px;
+          font-size: 12px;
+          font-weight: bold;
+          color: #527881;
+          text-shadow: 0 1px #e3f1f1;
+          background: #cde5ef;
+          border: 1px solid;
+          border-color: #b4ccce #b3c0c8 #9eb9c2;
+          border-radius: 16px;
+          outline: 0;
           cursor: pointer;
+          -webkit-box-sizing: content-box;
+          -moz-box-sizing: content-box;
+          box-sizing: content-box;
+          background-image: -webkit-linear-gradient(top, #edf5f8, #cde5ef);
+          background-image: -moz-linear-gradient(top, #edf5f8, #cde5ef);
+          background-image: -o-linear-gradient(top, #edf5f8, #cde5ef);
+          background-image: linear-gradient(to bottom, #edf5f8, #cde5ef);
+          -webkit-box-shadow: inset 0 1px white, 0 1px 2px rgba(0, 0, 0, 0.15);
+          box-shadow: inset 0 1px white, 0 1px 2px rgba(0, 0, 0, 0.15);
         }
 
         #delete-verification {
-          position: absolute;
-          display: none;
-          height: 200px;
-          width: 250px;
-          margin-top: 25px;
-          margin-right: 10%;
+          height: 100px;
+          width: 50%px;
+          background-color: #caf0f8;
+          text-align: center;
+          padding: 20px;
+          position: center;
+          border-radius: 4px;
+          margin-top: 50px;
+          font-family: Arial, Helvetica, sans-serif;
         }
+
+        .close {
+          position: absolute;
+          top: 0;
+          right: 10px;
+          font-size: 30px;
+          color: #333;
+          transform: rotate(45deg);
+          cursor: pointer;
+        }
+
+        .close:hover {
+          color: #666;
+        }
+}
 
       </style>
     </head>
     <body>
       <dialog id="delete-verification">
+        <div id="close" class="close">+</div>
         <h3>Are you sure you wish to delete this vault entry?</h3>
-        <button id="yes-delete">Yes, Delete</button>
-        <button id="no-keep">No, Keep</button>
+        <button class="option-button" id="yes-delete">Yes, Delete</button>
+        <button class="option-button" id="no-keep">No, Keep</button>
       </dialog>
       <section>
         <!--for demo wrap-->

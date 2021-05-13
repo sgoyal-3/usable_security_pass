@@ -421,8 +421,6 @@ function displayPasswordGenButton() {
                 .catch((err) => console.log(err));
             })
 
-
-
         })
     })
 }
