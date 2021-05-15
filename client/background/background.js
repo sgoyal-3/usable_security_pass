@@ -275,7 +275,8 @@ to your MashyPass vault?.`,
           })
           .then(function(response) {
             console.log(response);
-            getReuseStatistics();
+            displayAllSetNotif();
+            setTimeout(getReuseStatistics, 15000);
           })
           .catch(function(error) {
             console.log(error);
@@ -289,6 +290,53 @@ to your MashyPass vault?.`,
 
   })
 }
+
+
+/*
+* displayAllSetNotif: Let user know that their credentials were successfully
+* added to their vault
+*/
+function displayAllSetNotif() {
+  var notifOptions = {
+    type: "basic",
+    title: "All Set!",
+    message: `Your credentials have been successfully added to your vault. Feel free 
+to look at your vault or explore our homepage`,
+    iconUrl: "assets/secure.png",
+    silent: true,
+    buttons: [
+      {
+        title: "Go to Home Page"
+      },
+      {
+        title: "Look at My Vault"
+      }
+    ]
+  }
+
+  chrome.notifications.create('all-set-notif', notifOptions, () => {
+    console.log("Launching all set notif...");
+
+    chrome.notifications.onButtonClicked.addListener((notifId, buttonIdx) => {
+      if (notifId === 'all-set-notif') {
+        if (buttonIdx == 0) {
+          chrome.tabs.create({
+            'url': 'chrome-extension://aofelgdcnljcjeejddhcknappobidfch/html/home.html'
+          })
+        } else {
+          chrome.tabs.create({
+            'url': 'chrome-extension://aofelgdcnljcjeejddhcknappobidfch/html/vault.html'
+          })
+        }
+      }
+      chrome.notifications.clear('all-set-notif', () => {
+        console.log('cleared all set notif');
+      })
+    })
+  })
+}
+
+
 
 
 /*
