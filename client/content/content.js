@@ -27116,7 +27116,6 @@ function displayPasswordGenButton() {
             dialogBox.style.display = "flex";
 
             document.getElementById("close").addEventListener("click", () => {
-                console.log("hello");
                 dialogBox.style.display = "none";
             })
 
@@ -27124,20 +27123,7 @@ function displayPasswordGenButton() {
                 fillInPasswordFeedback(passwordInput);
             })
             
-            let showPassword = document.getElementById("show-password");
-            showPassword.addEventListener('click', (e) => {
-                e.preventDefault();
-                let currentPassword = document.getElementById("current-password");
-                if (showPassword.value === "ON") {
-                    showPassword.value = "OFF";
-                    showPassword.innerHTML = "Show Current Password";
-                    currentPassword.style.display = "none";
-                } else {
-                    showPassword.value = "ON";
-                    showPassword.innerHTML = "Hide Current Password";
-                    currentPassword.style.display = "flex";
-                }
-            })
+            
 
             document.getElementById("auto-generate").addEventListener("click", (e) => {
                 e.preventDefault();
@@ -27157,9 +27143,23 @@ function displayPasswordGenButton() {
                 .catch((err) => console.log(err));
             })
 
-
-
         })
+
+        let showPassword = document.getElementById("show-password");
+            showPassword.addEventListener('click', (e) => {
+                console.log("Clicking on show password");
+                console.log(showPassword.value);
+                let currentPassword = document.getElementById("current-password");
+                if (showPassword.value === "ON") {
+                    showPassword.value = "OFF";
+                    showPassword.innerHTML = "Show Password";
+                    currentPassword.style.display = "none";
+                } else {
+                    showPassword.value = "ON";
+                    showPassword.innerHTML = "Hide Password";
+                    currentPassword.style.display = "flex";
+                }
+            })
     })
 }
 

@@ -18,7 +18,7 @@ window.addEventListener('load', function() {
 * Send the user to the home page if they click the home link
 */
 window.addEventListener('load', function() {
-    let registerLink = document.getElementById("home-link");
+    let registerLink = document.getElementById("home-page");
     registerLink.addEventListener('click', function() {
         //redirect
         chrome.tabs.create({url: "html/home.html"});
