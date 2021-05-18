@@ -24,5 +24,9 @@ window.addEventListener('load', function() {
         chrome.tabs.create({url: "html/home.html"});
     })
 
-
+    let signOut = document.getElementById('sign-out');
+    signOut.addEventListener('click', () => {
+      document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
+      window.location.replace('/html/popup.html')
+    })
 })
