@@ -26951,7 +26951,7 @@ window.addEventListener('load', function() {
 	                    document.cookie = `email=${email.value}; path=/`;
 	                    console.log(document.cookie);
 						port.postMessage({type:'save-cookies', email: email.value, session_id:resp.data});
-						window.location.replace("/html/registration_successful.html");
+						window.location.replace("/html/home.html");
 					})
 	                .catch(function(error) {
 	                    console.log(error);
