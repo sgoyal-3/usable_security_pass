@@ -3,11 +3,12 @@
     "name": "MASHYPass",
     "version": "1.0.0",
     "content_scripts": [{
-      "matches": ["*://*/*"],
+      "matches": ["*://mashypass-app.herokuapp.com/*"],
       "js": ["content/content.js"]
     }],
     "permissions": [
-      "tabs", "activeTab", "http://*/", "https://*/", "notifications", 
+      "tabs", "activeTab", "http://mashypass-app.herokuapp.com/*", "https://mashypass-app.herokuapp.com/*", 
+      "notifications", 
       "chrome-extension://aofelgdcnljcjeejddhcknappobidfch/html/popup.html"
     ],
     "browser_action": {
