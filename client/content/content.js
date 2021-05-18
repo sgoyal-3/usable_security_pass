@@ -26957,16 +26957,16 @@ function main(){
 
 
 function loginPageLogic(){
-    console.log("in loginPageLogic")
-
-    var url = url_domain(document.location);
+    console.log("in loginPageLogic");
+    let href = window.location.href.toString();
+    let hostname = href.toString().substr(0, href.indexOf('?'));
  
     console.log("sending axios now with following email and session id: ");
     console.log(email);
     console.log(sessionId);
 
 
-    axios.get(`https://mashypass-app.herokuapp.com/api/vault?session-id=${sessionId}&email=${email}&url=${url}`, {})
+    axios.get(`https://mashypass-app.herokuapp.com/api/vault?session-id=${sessionId}&email=${email}&url=${hostname}`, {})
     .then(function (response) {
         //creds for this url found in vault
         console.log(response);

@@ -8,8 +8,7 @@
     }],
     "permissions": [
       "tabs", "activeTab", "http://mashypass-app.herokuapp.com/*", "https://mashypass-app.herokuapp.com/*", 
-      "notifications", 
-      "chrome-extension://aofelgdcnljcjeejddhcknappobidfch/html/popup.html"
+      "notifications"
     ],
     "browser_action": {
       "default_popup" : "html/popup.html",
@@ -21,7 +20,7 @@
     },
     "externally_connectable" : {
       "ids" : ["bebffpohmffmkmbmanhdpepoineaegai"],
-      "matches" : ["*://*/*"],
+      "matches" : ["*://mashypass-app.herokuapp.com/*"],
       "accepts_tls_channel_id" : false
     },
     "web_accessible_resources":["content/script.mjs", "html/popup.html", 
