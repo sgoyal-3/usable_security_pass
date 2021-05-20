@@ -201,6 +201,8 @@ function doInCurrentTab(tabCallback) {
 }
 
 
+let extensionId = window.location.host;
+
 /*
 * displayLoginNotif: Use a Chrome notification to remind a user
 * to login when they are on a site that requires them to enter a password
@@ -229,7 +231,7 @@ to your vault and get help generating a secure password.`,
     console.log(notifId);
     if (notifId === 'login-notif'){
       chrome.tabs.create({
-        url: "chrome-extension://aofelgdcnljcjeejddhcknappobidfch/html/popup.html"
+        url: `chrome-extension://${extensionId}/html/popup.html`
       });
     
       chrome.notifications.clear('login-notif', () => {
@@ -316,16 +318,17 @@ to look at your vault or explore our homepage`,
 
   chrome.notifications.create('all-set-notif', notifOptions, () => {
     console.log("Launching all set notif...");
+    
 
     chrome.notifications.onButtonClicked.addListener((notifId, buttonIdx) => {
       if (notifId === 'all-set-notif') {
         if (buttonIdx == 0) {
           chrome.tabs.create({
-            'url': 'chrome-extension://aofelgdcnljcjeejddhcknappobidfch/html/home.html'
+            'url': `chrome-extension://${extensionId}/html/home.html`
           })
         } else {
           chrome.tabs.create({
-            'url': 'chrome-extension://aofelgdcnljcjeejddhcknappobidfch/html/vault.html'
+            'url': `chrome-extension://${extensionId}/html/vault.html`
           })
         }
       }
@@ -374,7 +377,7 @@ function displayReuseNotif(reuseStatistics) {
       if (buttonIdx == 0) {
         console.log('left button was clicked');
         chrome.tabs.create({
-          url: "chrome-extension://aofelgdcnljcjeejddhcknappobidfch/html/vault.html"
+          url: `chrome-extension://${extensionId}/html/vault.html`
         })
       } else if (buttonIdx == 1) {
         console.log('right button was clicked');
@@ -474,6 +477,7 @@ var registration_point = "";
 
 var email = "";
 var session_id = "";
+console.log(window.location);
 
 
 
@@ -624,9 +628,6 @@ chrome.tabs.onUpdated.addListener((tabId, change, tab) => {
     }
     
 });
-
-
-
 
 
 
